@@ -10,7 +10,7 @@ Small Javascript object settings for personalized Web-Applications.
 
 
 ### Where to use
-DomGrid ist NOT like angular or react, you have to write much more code, if you start with.
+DomGrid is NOT like angular or react, you have to write much more code, if you start with.
 
 You can build your own version cycle up to the requirements of your Application, not of the Framework you are using.
 
