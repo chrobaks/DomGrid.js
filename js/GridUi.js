@@ -89,16 +89,22 @@ class GridUi
 
     static checkClassList (obj, listClass)
     {
-        let result = true;
+        const getClassName = (arguments.length > 2) ? arguments[2] : 0;
+        let result = (getClassName) ? '' : true;
 
         for (let e in listClass) {
-            if (!obj.classList.contains(listClass[e])) {
-                result = false;
-                break;
+            if (getClassName) {
+                if (obj.classList.contains(listClass[e])) {
+                    result = listClass[e];
+                    break;
+                }
+            } else {
+                if (!obj.classList.contains(listClass[e])) {
+                    result = false;
+                    break;
+                }
             }
         }
-
-        return result;
     }
 
     static checkDataChanged (list)
