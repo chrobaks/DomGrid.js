@@ -137,6 +137,15 @@ class GridUi
         return result;
     }
 
+    static checkScrollEnd (y, statusObj) {
+        if ((window.scrollY || document.body.scrollTop || document.documentElement.scrollTop) < y) {
+            window.requestAnimationFrame(() => {GridUi.checkScrollEnd(y, statusObj)});
+        } else {
+            statusObj.status = 0;
+            console.log('end of scroll',statusObj);
+        }
+    }
+
     static formList (container)
     {
         return [

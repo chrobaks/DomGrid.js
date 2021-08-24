@@ -28,15 +28,17 @@ class GridComponent
 
         eventList.map((conf) => 
         {
-            const list = this.container.querySelectorAll(conf.selector);
+            const list = (conf.selector !== '')
+                ? this.container.querySelectorAll(conf.selector)
+                : [this.container];
 
             if (list && list.length) {
                 [...list].map((obj) => {
                     obj[conf.action] = () => {
 
                         const event = (conf.hasOwnProperty('callBack')) ? conf.callBack : null;
-                        
-                        if (typeof this[event] !== 'undefined') { 
+
+                        if (typeof this[event] !== 'undefined') {
                             if (conf.hasOwnProperty('callParam')) {
                                 this[event](obj, conf.callParam);
                             } else {
