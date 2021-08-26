@@ -1,0 +1,1426 @@
+Index: README.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/README.md b/README.md
+--- a/README.md	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/README.md	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -6,7 +6,7 @@
+ yarn serve
+ ```
+ 
+-### Singlepage Javascript framework
++## Singlepage Javascript framework
+ 
+ Small Javascript object settings for personalized Web-Applications.
+ 
+@@ -21,10 +21,15 @@
+ 
+ You can build your own version cycle up to the requirements of your Application, not of the Framework you are using.
+ 
++## Customization
++
++look into config folder.
++
+ ### Structure
+ 
+ - config
+   - test.js
++  - theme.scss
+ - src
+   - component
+     - ComponentName
+@@ -42,7 +47,8 @@
+ - index.html
+ - webpack.config.js
+ - 
+-### Documentation 
++
++## Documentation 
+ 
+ #### DomGrid.js 
+ - Instantiate GridModal
+Index: config/test.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/config/test.js b/config/test.js
+--- a/config/test.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/config/test.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,3 +1,4 @@
+ export const config = {
+-    'test': true
++    'test': true,
++    'containerId' : '#container'
+ }
+\ No newline at end of file
+Index: config/theme.scss
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/config/theme.scss b/config/theme.scss
+new file mode 100644
+--- /dev/null	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/config/theme.scss	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -0,0 +1,17 @@
++// hier bitte nur ein paar Konstanten,
++// die es erlauben es etwas zu personalisieren
++
++$color-border: #cccccc;
++$color-text: #333333;
++$color-headlines: #666666;
++
++$border: 1px solid $color-border;
++
++$font-headlines: Verdana, Tahoma, sans-serif;
++$font-text: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
++$font-misc: 'Times New Roman', serif;
++$font-pre: 'Lucida Console', monospace;
++
++// Alle Componenten sollten selbst keinen konkreten Angaben
++// zu Fonts, Farben Rahmen und Abständen mehr enthalten
++// sondern sich ausschließlich auf diese Konstanten beziehen.
+\ No newline at end of file
+Index: src/component/GridDataTable/DataTable.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTable/DataTable.js b/src/component/GridDataTable/DataTable.js
+--- a/src/component/GridDataTable/DataTable.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridDataTable/DataTable.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,9 +1,15 @@
+-import "./dataTable.scss"; // jede Komponente sollte ihr eigenes CSS mitbringen!
++import "./dataTable.scss";
++import {DataTableSearch} from "./DataTableSearch";
++import {DataTableEvent} from "./DataTableEvent";
++import {DataTableView} from "./DataTableView";
++import {DataTableToolBar} from "./DataTableToolBar";
++import {DataTableConf} from "./DataTableConf";
++import {GridUi} from "../../service/GridUi/GridUi";
+ 
+ export class DataTable {
+     constructor(container, config) {
+         // Set config
+-        this.config = DataTableConf.getConf(config);
++        this.config = DataTableConf; // TODO was ist mit config?
+         this.config.dom.container = container;
+         // Init components
+         this.Search = new DataTableSearch();
+Index: src/component/GridDataTable/DataTableComponent.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTable/DataTableComponent.js b/src/component/GridDataTable/DataTableComponent.js
+--- a/src/component/GridDataTable/DataTableComponent.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridDataTable/DataTableComponent.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,4 +1,6 @@
+-import {GridComponent} from "../../service/GridComponent";
++import {GridComponent} from "../../service/GridComponent/GridComponent";
++import {DataTable} from "./DataTable";
++import {GridDatePicker} from "../GridDatePicker/GridDatePicker";
+ 
+ export class DataTableComponent extends GridComponent {
+     constructor(obj, nameSpace, callerInput) {
+Index: src/component/GridDataTable/DataTableSearch.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTable/DataTableSearch.js b/src/component/GridDataTable/DataTableSearch.js
+--- a/src/component/GridDataTable/DataTableSearch.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridDataTable/DataTableSearch.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,8 +1,14 @@
++import {DataTableUtile} from "../GridDataTableNew/DataTableUtile";
++
+ export class DataTableSearch {
+     constructor() {
+         this.config = {};
+     }
+ 
++    set _config(obj) {
++        this.config = Object.assign(this.config, obj);
++    }
++
+     getSearch(srchConf) {
+         const list = this.config.content.querySelectorAll('.data-row');
+         let result = [];
+@@ -71,8 +77,4 @@
+ 
+         return {arrRes: arrRes, arrRowIndex: arrRowIndex};
+     };
+-
+-    set _config(obj) {
+-        this.config = Object.assign(this.config, obj);
+-    }
+ }
+Index: src/component/GridDataTable/DataTableToolBar.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTable/DataTableToolBar.js b/src/component/GridDataTable/DataTableToolBar.js
+--- a/src/component/GridDataTable/DataTableToolBar.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridDataTable/DataTableToolBar.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,4 +1,5 @@
+ import "./dataTableToolBar.scss";
++import {DataTableUtile} from "../GridDataTableNew/DataTableUtile";
+ 
+ export class DataTableToolBar {
+     constructor(DataTable) {
+Index: src/component/GridDataTable/DataTableUtils.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTable/DataTableUtils.js b/src/component/GridDataTable/DataTableUtils.js
+--- a/src/component/GridDataTable/DataTableUtils.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridDataTable/DataTableUtils.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,3 +1,5 @@
++import {DataTableUtile} from "../GridDataTableNew/DataTableUtile";
++
+ export class DataTableUtils {
+     static getStrNumber(i, str) {
+         let res = "";
+Index: src/component/GridDataTable/DataTableView.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTable/DataTableView.js b/src/component/GridDataTable/DataTableView.js
+--- a/src/component/GridDataTable/DataTableView.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridDataTable/DataTableView.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -57,7 +57,7 @@
+ 
+             }
+             if (css === 'data-col') {
+-                col.setAttribute('data-col-index', colIndex);
++                col.setAttribute('data-col-index', colIndex + "");
+                 if (this.config.arrToggleList.indexOf(colIndex + "") !== -1) {
+                     col.style.display = "none";
+                 }
+Index: src/component/GridDataTable/GridDataTable.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTable/GridDataTable.js b/src/component/GridDataTable/GridDataTable.js
+new file mode 100644
+--- /dev/null	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/GridDataTable/GridDataTable.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -0,0 +1,4 @@
++import {DataTable} from "./DataTable";
++import {DataTableConf} from "./DataTableConf";
++
++export const GridDataTable = new DataTable(DataTableConf);
+\ No newline at end of file
+Index: src/component/GridDataTable/dataTable.scss
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTable/dataTable.scss b/src/component/GridDataTable/dataTable.scss
+--- a/src/component/GridDataTable/dataTable.scss	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridDataTable/dataTable.scss	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,34 +1,37 @@
++@import "../../../config/theme";
++
+ .dataTable {
+   width: 100%;
+   overflow: hidden;
+-  border: 1px solid #ccc;
++  border: $border;
++  font-family: $font-text;
+ }
+ 
+ // TODO Bitte zerlegen!
+ 
+ .dataTable-toolbar, .dataTable-header-toolbar, .dataTable-content-toolbar, .col-header {
+-  font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
++  font-family: $font-text;
+ }
+ 
+ .col-search {
+-  font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
++  font-family: $font-text;
+ 
+   button {
+-    font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
++    font-family: $font-text;
+   }
+ }
+ 
+ .dataTable-table {
+   th.th-sticky {
+-    font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
++    font-family: $font-text;
+   }
+ 
+   td {
+     &.td-sticky {
+-      font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
++      font-family: $font-text;
+     }
+ 
+-    font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
++    font-family: $font-text;
+   }
+ }
+ 
+@@ -39,7 +42,7 @@
+   width: 100%;
+   height: 27px;
+   background-color: #666;
+-  border-bottom: 1px solid #666;
++  border-bottom: $border;
+   z-index: 2;
+ }
+ 
+Index: src/component/GridDataTable/dataTableToolBar.scss
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTable/dataTableToolBar.scss b/src/component/GridDataTable/dataTableToolBar.scss
+--- a/src/component/GridDataTable/dataTableToolBar.scss	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridDataTable/dataTableToolBar.scss	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,1 +1,3 @@
++@import "../../../config/theme";
++
+ // Todo
+\ No newline at end of file
+Index: src/component/GridDataTable/index.js
+===================================================================
+diff --git a/src/component/GridDataTable/index.js b/src/component/GridDataTable/index.js
+deleted file mode 100644
+--- a/src/component/GridDataTable/index.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ /dev/null	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
+@@ -1,12 +0,0 @@
+-import {DataTable} from "./DataTable";
+-import {DataTableComponent} from "./DataTableComponent";
+-import {DataTableEvent} from "./DataTableEvent";
+-import {DataTableSearch} from "./DataTableSearch";
+-import {DataTableToolBar} from "./DataTableToolBar";
+-import {DataTableUtils} from "./DataTableUtils";
+-import {DataTableView} from "./DataTableView";
+-
+-// TODO Wie willst du das zusammen stecken?
+-// Wird das alles ggf in der config vorgehalten?
+-
+-export const DataTable = new DataTable(DataTableConf);
+\ No newline at end of file
+Index: src/component/GridDataTableNew/DataTable.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTableNew/DataTable.js b/src/component/GridDataTableNew/DataTable.js
+new file mode 100644
+--- /dev/null	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/GridDataTableNew/DataTable.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -0,0 +1,13 @@
++import {DataTableConf} from "./DataTableConf";
++
++export class DataTable {
++    constructor(container, config) {
++        // Set config
++        this.config = DataTableConf.getConf(config);
++        this.config.dom.container = container;
++    }
++
++    setRequest() {
++        // TODO
++    }
++}
+\ No newline at end of file
+Index: src/component/GridDataTableNew.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTableNew.js b/src/component/GridDataTableNew/DataTableConf.js
+rename from src/component/GridDataTableNew.js
+rename to src/component/GridDataTableNew/DataTableConf.js
+--- a/src/component/GridDataTableNew.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridDataTableNew/DataTableConf.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,122 +1,4 @@
+-// TODO
+-//
+-class DataTableUtile {
+-    static getStrNumber(i, str) {
+-        let res = "";
+-        let nextChar = null;
+-        let doIt = true;
+-        while (doIt) {
+-            res += "" + str[i];
+-            if (i + 1 < str.length && /^[\d]$/.test(str[i + 1])) {
+-                i++;
+-            } else {
+-                if (i + 1 < str.length) {
+-                    nextChar = str[i + 1];
+-                }
+-                doIt = false;
+-            }
+-        }
+-
+-        return {res: res, nextChar: nextChar};
+-    }
+-
+-    static getSortRes(a, b, orderAsc) {
+-        if (a < b) return ((orderAsc) ? 1 : -1);
+-        if (a > b) return ((orderAsc) ? -1 : 1);
+-        return 0;
+-    }
+-
+-    static getSort(arr, orderAsc, config) {
+-        let res = arr;
+-        res.sort(function (a, b) {
+-            return DataTableUtile.getSortRes(a[1], b[1], orderAsc)
+-        });
+-
+-        return res.sort(function (a, b) {
+-            if (/^[\d]{2}\.[\d]{2}\.[\d]{4}$/.test(a[1]) && /^[\d]{2}\.[\d]{2}\.[\d]{4}$/.test(b[1])) {
+-                return DataTableUtile.sortDate(a[1], b[1], orderAsc, config.dateLang);
+-            } else {
+-                return DataTableUtile.sortString(a, b, orderAsc);
+-            }
+-        });
+-    }
+-
+-    static getLangDate(date, lang) {
+-        date = date.split('.');
+-        const res = (lang === 'de') ? new Date(date[2] * 1, date[1] * 1 - 1, date[0] * 1).getTime() : new Date(date[2] * 1, date[0] * 1 - 1, date[1] * 1).getTime();
+-
+-        return res;
+-    }
+-
+-    static sortDate(a, b, orderAsc, dateLang) {
+-        const dateA = DataTableUtile.getLangDate(a, dateLang);
+-        const dateB = DataTableUtile.getLangDate(b, dateLang);
+-
+-        return DataTableUtile.getSortRes(dateA, dateB, orderAsc);
+-    }
+-
+-    static getValidInpt(obj) {
+-        let intVal = obj.inpt.value.trim();
+-        let res = null;
+-
+-        if (/^[\d]+$/.test(intVal) && intVal) {
+-            if (obj.max < intVal * 1) {
+-                intVal = obj.max;
+-                obj.inpt.value = intVal;
+-            }
+-            res = intVal * 1;
+-        } else {
+-            obj.inpt.value = obj.default;
+-        }
+-
+-        return res;
+-    }
+-
+-    static sortString(a, b, orderAsc) {
+-        const arr0 = (a[1]) ? a[1].toLowerCase().match(/[^\W*]/g) : "";
+-        const arr1 = (b[1]) ? b[1].toLowerCase().match(/[^\W*]/g) : "";
+-        let res0 = "";
+-        let res1 = "";
+-
+-        for (let i = 0; i < arr0.length; i++) {
+-            if (/^[\d]$/.test(arr0[i]) && /^[\d]$/.test(arr1[i])) {
+-                const objNr0 = this.getStrNumber(i, arr0);
+-                const objNr1 = this.getStrNumber(i, arr1);
+-                let n0 = objNr0.res * 1;
+-                let n1 = objNr1.res * 1;
+-
+-                if (n0 === n1) {
+-                    if (objNr0.nextChar !== null && objNr1.nextChar === null) {
+-                        n0 = 1;
+-                        n1 = 0;
+-                    } else if (objNr1.nextChar !== null && objNr0.nextChar === null) {
+-                        n0 = 0;
+-                        n1 = 1;
+-                    }
+-                }
+-                return DataTableUtile.getSortRes(n0, n1, orderAsc);
+-            }
+-            if (arr1.length <= i && res0 === res1 || arr0[i] != arr1[i] && /^[\d]$/.test(arr1[i])) {
+-                return (!orderAsc) ? 1 > 0 : 1 < 0;
+-            } else {
+-                res0 = arr0[i];
+-                res1 = arr1[i];
+-                if (arr0[i] != arr1[i]) {
+-                    return DataTableUtile.getSortRes(arr0[i], arr1[i], orderAsc);
+-                }
+-            }
+-        }
+-
+-        return DataTableUtile.getSortRes(res1, res0, orderAsc);
+-    }
+-}
+-
+-/**
+- * ------------------------------------
+- * DataTableConf
+- * ------------------------------------
+- */
+-class DataTableConf {
++export class DataTableConf {
+     static getConf(config) {
+         const defaultConf = {
+             dataTable: [],
+@@ -205,125 +87,3 @@
+         return Object.assign(defaultConf, config);
+     }
+ }
+-
+-/**
+- * ------------------------------------
+- * DataTableSearch
+- * ------------------------------------
+- */
+-class DataTableSearch {
+-    constructor() {
+-        this.config = {};
+-    }
+-
+-    getSearch(srchConf) {
+-        const list = this.config.content.querySelectorAll('.data-row');
+-        let result = [];
+-        let revertIndex = list.length - 1;
+-        srchConf.val = srchConf.val.toLowerCase();
+-        srchConf.colIndex = srchConf.colIndex * 1;
+-
+-        for (let i = 0; i < list.length; i++) {
+-
+-            let colVal1 = list[i].querySelectorAll('.data-col')[srchConf.index].innerHTML.toLowerCase();
+-            let colVal2 = list[revertIndex].querySelectorAll('.data-col')[srchConf.index].innerHTML.toLowerCase();
+-
+-            if (srchConf.type === 'date' && srchConf.hasOwnProperty('dateEnd')) {
+-
+-                let sDate = DataTableUtile.getLangDate(srchConf.val, this.config.dateLang);
+-                let eDate = DataTableUtile.getLangDate(srchConf.dateEnd, this.config.dateLang);
+-                colVal1 = DataTableUtile.getLangDate(colVal1, this.config.dateLang);
+-                colVal2 = DataTableUtile.getLangDate(colVal2, this.config.dateLang);
+-
+-                if (colVal1 >= sDate && colVal1 <= eDate) {
+-                    result.push(list[i].dataset.rowIndex * 1);
+-                }
+-                if (revertIndex > i) {
+-                    if (colVal2 >= sDate && colVal2 <= eDate) {
+-                        result.push(list[revertIndex].dataset.rowIndex * 1);
+-                    }
+-                    revertIndex--;
+-                }
+-
+-            } else {
+-                if (colVal1 === srchConf.val) {
+-                    result.push(list[i].dataset.rowIndex * 1);
+-                }
+-                if (revertIndex > i) {
+-                    if (colVal2 === srchConf.val) {
+-                        result.push(list[revertIndex].dataset.rowIndex * 1);
+-                    }
+-                    revertIndex--;
+-                }
+-            }
+-
+-            if (revertIndex === i) {
+-                break;
+-            }
+-        }
+-
+-        return result;
+-    }
+-
+-    getSort(colIndex, order) {
+-        let arrRes = [];
+-        let arrIndex = [];
+-        let arrRowIndex = [];
+-        const asc = (order === 'down') ? 1 : 0;
+-
+-        for (let i = 0; i < this.config.dataTable.length; i++) {
+-            let rowId = this.config.content.getElementsByClassName("data-row")[i].dataset.rowIndex * 1;
+-            arrIndex.push([rowId, this.config.dataTable[rowId][colIndex]]);
+-        }
+-        arrIndex = DataTableUtile.getSort(arrIndex, asc, this.config);
+-
+-        for (let n = 0; n < arrIndex.length; n++) {
+-            arrRes.push(this.config.dataTable[arrIndex[n][0] * 1]);
+-            arrRowIndex.push(arrIndex[n][0] * 1);
+-        }
+-
+-        return {arrRes: arrRes, arrRowIndex: arrRowIndex};
+-    };
+-
+-    set _config(obj) {
+-        this.config = Object.assign(this.config, obj);
+-    }
+-}
+-
+-class DataTable {
+-    constructor(container, config) {
+-        // Set config
+-        this.config = DataTableConf.getConf(config);
+-        this.config.dom.container = container;
+-    }
+-}
+-
+-class DataTableHandler extends DataTable {
+-    constructor(container, config) {
+-        super(container, config);
+-    }
+-}
+-
+-
+-class GridDataTableNew extends GridComponent {
+-    constructor(obj, nameSpace, callerInput) {
+-        super(obj, nameSpace);
+-
+-        // Create DataTable instance
+-        this.dataTable = new DataTable(this.container, {ajaxUrl: this.containerUrl, domAttr: {colWidth: 250, mnWidth: 70}});
+-
+-        this.eventConfig = [
+-            {selector: ".datepicker", action: "onmouseover", callBack: "setDatepicker"},
+-        ];
+-
+-        this.setEvents();
+-    }
+-
+-    setDatepicker(obj) {
+-        GridDatePicker.createInstance(this.nameSpace, obj);
+-    }
+-
+-    refreshDataTable() {
+-        this.dataTable.setRequest();
+-    }
+-}
+\ No newline at end of file
+Index: src/component/GridDataTableNew/DataTableHandler.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTableNew/DataTableHandler.js b/src/component/GridDataTableNew/DataTableHandler.js
+new file mode 100644
+--- /dev/null	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/GridDataTableNew/DataTableHandler.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -0,0 +1,7 @@
++import {DataTable} from "./DataTable";
++
++export class DataTableHandler extends DataTable {
++    constructor(container, config) {
++        super(container, config);
++    }
++}
+\ No newline at end of file
+Index: src/component/GridDataTableNew/DataTableSearch.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTableNew/DataTableSearch.js b/src/component/GridDataTableNew/DataTableSearch.js
+new file mode 100644
+--- /dev/null	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/GridDataTableNew/DataTableSearch.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -0,0 +1,80 @@
++import {DataTableUtile} from "./DataTableUtile";
++
++export class DataTableSearch {
++    constructor() {
++        this.config = {};
++    }
++
++    set _config(obj) {
++        this.config = Object.assign(this.config, obj);
++    }
++
++    getSearch(srchConf) {
++        const list = this.config.content.querySelectorAll('.data-row');
++        let result = [];
++        let revertIndex = list.length - 1;
++        srchConf.val = srchConf.val.toLowerCase();
++        srchConf.colIndex = srchConf.colIndex * 1;
++
++        for (let i = 0; i < list.length; i++) {
++
++            let colVal1 = list[i].querySelectorAll('.data-col')[srchConf.index].innerHTML.toLowerCase();
++            let colVal2 = list[revertIndex].querySelectorAll('.data-col')[srchConf.index].innerHTML.toLowerCase();
++
++            if (srchConf.type === 'date' && srchConf.hasOwnProperty('dateEnd')) {
++
++                let sDate = DataTableUtile.getLangDate(srchConf.val, this.config.dateLang);
++                let eDate = DataTableUtile.getLangDate(srchConf.dateEnd, this.config.dateLang);
++                colVal1 = DataTableUtile.getLangDate(colVal1, this.config.dateLang);
++                colVal2 = DataTableUtile.getLangDate(colVal2, this.config.dateLang);
++
++                if (colVal1 >= sDate && colVal1 <= eDate) {
++                    result.push(list[i].dataset.rowIndex * 1);
++                }
++                if (revertIndex > i) {
++                    if (colVal2 >= sDate && colVal2 <= eDate) {
++                        result.push(list[revertIndex].dataset.rowIndex * 1);
++                    }
++                    revertIndex--;
++                }
++
++            } else {
++                if (colVal1 === srchConf.val) {
++                    result.push(list[i].dataset.rowIndex * 1);
++                }
++                if (revertIndex > i) {
++                    if (colVal2 === srchConf.val) {
++                        result.push(list[revertIndex].dataset.rowIndex * 1);
++                    }
++                    revertIndex--;
++                }
++            }
++
++            if (revertIndex === i) {
++                break;
++            }
++        }
++
++        return result;
++    }
++
++    getSort(colIndex, order) {
++        let arrRes = [];
++        let arrIndex = [];
++        let arrRowIndex = [];
++        const asc = (order === 'down') ? 1 : 0;
++
++        for (let i = 0; i < this.config.dataTable.length; i++) {
++            let rowId = this.config.content.getElementsByClassName("data-row")[i].dataset.rowIndex * 1;
++            arrIndex.push([rowId, this.config.dataTable[rowId][colIndex]]);
++        }
++        arrIndex = DataTableUtile.getSort(arrIndex, asc, this.config);
++
++        for (let n = 0; n < arrIndex.length; n++) {
++            arrRes.push(this.config.dataTable[arrIndex[n][0] * 1]);
++            arrRowIndex.push(arrIndex[n][0] * 1);
++        }
++
++        return {arrRes: arrRes, arrRowIndex: arrRowIndex};
++    };
++}
+Index: src/component/GridDataTableNew/DataTableUtile.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTableNew/DataTableUtile.js b/src/component/GridDataTableNew/DataTableUtile.js
+new file mode 100644
+--- /dev/null	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/GridDataTableNew/DataTableUtile.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -0,0 +1,110 @@
++export class DataTableUtile {
++    static getStrNumber(i, str) {
++        let res = "";
++        let nextChar = null;
++        let doIt = true;
++        while (doIt) {
++            res += "" + str[i];
++            if (i + 1 < str.length && /^[\d]$/.test(str[i + 1])) {
++                i++;
++            } else {
++                if (i + 1 < str.length) {
++                    nextChar = str[i + 1];
++                }
++                doIt = false;
++            }
++        }
++
++        return {res: res, nextChar: nextChar};
++    }
++
++    static getSortRes(a, b, orderAsc) {
++        if (a < b) return ((orderAsc) ? 1 : -1);
++        if (a > b) return ((orderAsc) ? -1 : 1);
++        return 0;
++    }
++
++    static getSort(arr, orderAsc, config) {
++        let res = arr;
++        res.sort(function (a, b) {
++            return DataTableUtile.getSortRes(a[1], b[1], orderAsc)
++        });
++
++        return res.sort(function (a, b) {
++            if (/^[\d]{2}\.[\d]{2}\.[\d]{4}$/.test(a[1]) && /^[\d]{2}\.[\d]{2}\.[\d]{4}$/.test(b[1])) {
++                return DataTableUtile.sortDate(a[1], b[1], orderAsc, config.dateLang);
++            } else {
++                return DataTableUtile.sortString(a, b, orderAsc);
++            }
++        });
++    }
++
++    static getLangDate(date, lang) {
++        date = date.split('.');
++        const res = (lang === 'de') ? new Date(date[2] * 1, date[1] * 1 - 1, date[0] * 1).getTime() : new Date(date[2] * 1, date[0] * 1 - 1, date[1] * 1).getTime();
++
++        return res;
++    }
++
++    static sortDate(a, b, orderAsc, dateLang) {
++        const dateA = DataTableUtile.getLangDate(a, dateLang);
++        const dateB = DataTableUtile.getLangDate(b, dateLang);
++
++        return DataTableUtile.getSortRes(dateA, dateB, orderAsc);
++    }
++
++    static getValidInpt(obj) {
++        let intVal = obj.inpt.value.trim();
++        let res = null;
++
++        if (/^[\d]+$/.test(intVal) && intVal) {
++            if (obj.max < intVal * 1) {
++                intVal = obj.max;
++                obj.inpt.value = intVal;
++            }
++            res = intVal * 1;
++        } else {
++            obj.inpt.value = obj.default;
++        }
++
++        return res;
++    }
++
++    static sortString(a, b, orderAsc) {
++        const arr0 = (a[1]) ? a[1].toLowerCase().match(/[^\W*]/g) : "";
++        const arr1 = (b[1]) ? b[1].toLowerCase().match(/[^\W*]/g) : "";
++        let res0 = "";
++        let res1 = "";
++
++        for (let i = 0; i < arr0.length; i++) {
++            if (/^[\d]$/.test(arr0[i]) && /^[\d]$/.test(arr1[i])) {
++                const objNr0 = this.getStrNumber(i, arr0);
++                const objNr1 = this.getStrNumber(i, arr1);
++                let n0 = objNr0.res * 1;
++                let n1 = objNr1.res * 1;
++
++                if (n0 === n1) {
++                    if (objNr0.nextChar !== null && objNr1.nextChar === null) {
++                        n0 = 1;
++                        n1 = 0;
++                    } else if (objNr1.nextChar !== null && objNr0.nextChar === null) {
++                        n0 = 0;
++                        n1 = 1;
++                    }
++                }
++                return DataTableUtile.getSortRes(n0, n1, orderAsc);
++            }
++            if (arr1.length <= i && res0 === res1 || arr0[i] != arr1[i] && /^[\d]$/.test(arr1[i])) {
++                return (!orderAsc) ? 1 > 0 : 1 < 0;
++            } else {
++                res0 = arr0[i];
++                res1 = arr1[i];
++                if (arr0[i] != arr1[i]) {
++                    return DataTableUtile.getSortRes(arr0[i], arr1[i], orderAsc);
++                }
++            }
++        }
++
++        return DataTableUtile.getSortRes(res1, res0, orderAsc);
++    }
++}
+Index: src/component/GridDataTableNew/GridDataTableNew.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTableNew/GridDataTableNew.js b/src/component/GridDataTableNew/GridDataTableNew.js
+new file mode 100644
+--- /dev/null	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/GridDataTableNew/GridDataTableNew.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -0,0 +1,29 @@
++import "./order-box-container.scss";
++
++import {GridComponent} from "../../service/GridComponent/GridComponent";
++
++import {DataTable} from "./DataTable";
++import {GridDatePicker} from "../GridDatePicker/GridDatePicker";
++
++export class GridDataTableNew extends GridComponent {
++    constructor(obj, nameSpace, callerInput) {
++        super(obj, nameSpace);
++
++        // Create DataTable instance
++        this.dataTable = new DataTable(this.container, {ajaxUrl: this.containerUrl, domAttr: {colWidth: 250, mnWidth: 70}});
++
++        this.eventConfig = [
++            {selector: ".datepicker", action: "onmouseover", callBack: "setDatepicker"},
++        ];
++
++        this.setEvents();
++    }
++
++    setDatepicker(obj) {
++        GridDatePicker.createInstance(this.nameSpace, obj);
++    }
++
++    refreshDataTable() {
++        this.dataTable.setRequest(); // TODO
++    }
++}
+\ No newline at end of file
+Index: style/order-box-container.scss
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/style/order-box-container.scss b/src/component/GridDataTableNew/order-box-container.scss
+rename from style/order-box-container.scss
+rename to src/component/GridDataTableNew/order-box-container.scss
+--- a/style/order-box-container.scss	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridDataTableNew/order-box-container.scss	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,3 +1,5 @@
++@import "../../../config/theme";
++
+ .order-box-container {
+   display: flex;
+   flex-wrap: wrap;
+Index: src/component/GridDatePicker.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDatePicker.js b/src/component/GridDatePicker/GridDatePicker.js
+rename from src/component/GridDatePicker.js
+rename to src/component/GridDatePicker/GridDatePicker.js
+--- a/src/component/GridDatePicker.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridDatePicker/GridDatePicker.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,4 +1,6 @@
+-import {GridComponent} from "../service/GridComponent";
++import {GridComponent} from "../../service/GridComponent/GridComponent";
++import "./date-picker.scss";
++import {GridUi} from "../../service/GridUi/GridUi";
+ 
+ export class GridDatePicker extends GridComponent {
+     constructor(obj, nameSpace, callerInput) {
+Index: style/date-picker.scss
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/style/date-picker.scss b/src/component/GridDatePicker/date-picker.scss
+rename from style/date-picker.scss
+rename to src/component/GridDatePicker/date-picker.scss
+--- a/style/date-picker.scss	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridDatePicker/date-picker.scss	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,14 +1,15 @@
++@import "../../../config/theme";
++
+ .date-picker {
+   display: none;
+   position: absolute;
+-  font-family: Arial;
++  font-family: $font-misc;
+   font-size: 11px;
+   width: 194px;
+   background-color: #999;
+   padding: 4px 0 4px 4px;
+ 
+   .date-picker-year, .date-picker-month {
+-    font-family: Arial;
+     width: 100%;
+     display: flex;
+     flex-wrap: wrap;
+@@ -40,7 +41,6 @@
+   }
+ 
+   .date-picker-items {
+-    font-family: Arial;
+     width: 100%;
+     display: flex;
+     flex-wrap: wrap;
+Index: src/component/GridEdit.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridEdit.js b/src/component/GridEdit/GridEdit.js
+rename from src/component/GridEdit.js
+rename to src/component/GridEdit/GridEdit.js
+--- a/src/component/GridEdit.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridEdit/GridEdit.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,4 +1,6 @@
+-import {GridComponent} from "../service/GridComponent";
++import {GridComponent} from "../../service/GridComponent/GridComponent";
++import {GridUi} from "../../service/GridUi/GridUi";
++import {GridStage} from "../../service/GridStage/GridStage";
+ 
+ export class GridEdit extends GridComponent {
+     constructor(obj, nameSpace) {
+Index: src/component/GridExampleModal.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridExampleModal.js b/src/component/GridExampleModal/GridExampleModal.js
+rename from src/component/GridExampleModal.js
+rename to src/component/GridExampleModal/GridExampleModal.js
+--- a/src/component/GridExampleModal.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridExampleModal/GridExampleModal.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,4 +1,5 @@
+-import {GridComponent} from "../service/GridComponent";
++import {GridComponent} from "../../service/GridComponent/GridComponent";
++import {GridStage} from "../../service/GridStage/GridStage";
+ 
+ export class GridExampleModal extends GridComponent {
+     constructor(obj, nameSpace) {
+Index: src/component/GridForm.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridForm.js b/src/component/GridForm/GridForm.js
+rename from src/component/GridForm.js
+rename to src/component/GridForm/GridForm.js
+--- a/src/component/GridForm.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridForm/GridForm.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,4 +1,6 @@
+-import {GridComponent} from "../service/GridComponent";
++import {GridComponent} from "../../service/GridComponent/GridComponent";
++import {GridDatePicker} from "../GridDatePicker/GridDatePicker";
++import {GridUi} from "../../service/GridUi/GridUi";
+ 
+ export class GridForm extends GridComponent {
+     constructor(obj, nameSpace) {
+Index: src/component/GridFormList.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridFormList.js b/src/component/GridFormList/GridFormList.js
+rename from src/component/GridFormList.js
+rename to src/component/GridFormList/GridFormList.js
+--- a/src/component/GridFormList.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridFormList/GridFormList.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,4 +1,6 @@
+-import {GridComponent} from "../service/GridComponent";
++import {GridComponent} from "../../service/GridComponent/GridComponent";
++import {GridUi} from "../../service/GridUi/GridUi";
++import {GridStage} from "../../service/GridStage/GridStage";
+ 
+ export class GridFormList extends GridComponent {
+     constructor(obj, nameSpace) {
+Index: src/component/GridSelectContent.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridSelectContent.js b/src/component/GridSelectContent/GridSelectContent.js
+rename from src/component/GridSelectContent.js
+rename to src/component/GridSelectContent/GridSelectContent.js
+--- a/src/component/GridSelectContent.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridSelectContent/GridSelectContent.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,4 +1,6 @@
+-import {GridComponent} from "../service/GridComponent";
++import {GridComponent} from "../../service/GridComponent/GridComponent";
++import {GridUi} from "../../service/GridUi/GridUi";
++import {GridStage} from "../../service/GridStage/GridStage";
+ 
+ export class GridSelectContent extends GridComponent {
+     requestSelectId;
+Index: src/component/GridSideNavi.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridSideNavi.js b/src/component/GridSideNavi/GridSideNavi.js
+rename from src/component/GridSideNavi.js
+rename to src/component/GridSideNavi/GridSideNavi.js
+--- a/src/component/GridSideNavi.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridSideNavi/GridSideNavi.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,4 +1,6 @@
+-import {GridComponent} from "../service/GridComponent";
++import {GridComponent} from "../../service/GridComponent/GridComponent";
++import "./grid-sidenavi.scss";
++import {GridUi} from "../../service/GridUi/GridUi";
+ 
+ class GridSideNavi extends GridComponent {
+     selectedIndex; // Active content index
+Index: style/grid-sidenavi.scss
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/style/grid-sidenavi.scss b/src/component/GridSideNavi/grid-sidenavi.scss
+rename from style/grid-sidenavi.scss
+rename to src/component/GridSideNavi/grid-sidenavi.scss
+--- a/style/grid-sidenavi.scss	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/component/GridSideNavi/grid-sidenavi.scss	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,3 +1,5 @@
++@import "../../../config/theme";
++
+ .grid-sidenavi {
+   position: fixed;
+   z-index: 99999;
+Index: src/component/__TODO.md
+===================================================================
+diff --git a/src/component/__TODO.md b/src/component/__TODO.md
+deleted file mode 100644
+--- a/src/component/__TODO.md	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ /dev/null	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
+@@ -1,7 +0,0 @@
+-# todo
+-
+-Bitte jede Klasse in einen eigenen Ordner.
+-
+-Jede Klasse dann kann weitere Klassen laden.
+-
+-Jede Klasse läd "ihr" SCSS aus "ihrem" Ordner.
+\ No newline at end of file
+Index: src/element/GridLinkElement.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/element/GridLinkElement.js b/src/element/GridLinkElement/GridLinkElement.js
+rename from src/element/GridLinkElement.js
+rename to src/element/GridLinkElement/GridLinkElement.js
+--- a/src/element/GridLinkElement.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/element/GridLinkElement/GridLinkElement.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,4 +1,5 @@
+-import {GridElement} from "../service/GridElement";
++import {GridUi} from "../../service/GridUi/GridUi";
++import {GridElement} from "../../service/GridElement/GridElement";
+ 
+ export class GridLinkElement extends GridElement {
+     action;
+Index: src/element/GridModalTplElement.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/element/GridModalTplElement.js b/src/element/GridModalTplElement/GridModalTplElement.js
+rename from src/element/GridModalTplElement.js
+rename to src/element/GridModalTplElement/GridModalTplElement.js
+--- a/src/element/GridModalTplElement.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/element/GridModalTplElement/GridModalTplElement.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,4 +1,6 @@
+-import {GridElement} from "../service/GridElement";
++import {GridUi} from "../../service/GridUi/GridUi";
++import {GridElement} from "../../service/GridElement/GridElement";
++import {GridStage} from "../../service/GridStage/GridStage";
+ 
+ export class GridModalTplElement extends GridElement {
+     constructor(container, parent) {
+Index: src/element/GridRowElement.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/element/GridRowElement.js b/src/element/GridRowElement/GridRowElement.js
+rename from src/element/GridRowElement.js
+rename to src/element/GridRowElement/GridRowElement.js
+--- a/src/element/GridRowElement.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/element/GridRowElement/GridRowElement.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,4 +1,6 @@
+-import {GridElement} from "../service/GridElement";
++import {GridElement} from "../../service/GridElement/GridElement";
++import {GridUi} from "../../service/GridUi/GridUi";
++import {GridStage} from "../../service/GridStage/GridStage";
+ 
+ export class GridRowElement extends GridElement {
+     constructor(container, parent) {
+Index: src/index.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/index.js b/src/index.js
+--- a/src/index.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/index.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,4 +1,4 @@
+-import {DomGrid} from "./service/DomGrid";
++import {DomGrid} from "./service/DomGrid/DomGrid";
+ import {config} from "../config/test";
+ 
+ new DomGrid(config); // geil oder? :D
+Index: src/service/DomGrid.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/DomGrid.js b/src/service/DomGrid/DomGrid.js
+rename from src/service/DomGrid.js
+rename to src/service/DomGrid/DomGrid.js
+--- a/src/service/DomGrid.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/service/DomGrid/DomGrid.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,12 +1,16 @@
+-import "../../style/index.scss"; // TODO auflösen!
++import {GridModal} from "../GridModal/GridModal";
++import {GridUi} from "../GridUi/GridUi";
++import {GridStage} from "../GridStage/GridStage";
+ 
+ export class DomGrid {
++    scriptPath; // TODO
++
+     constructor(config) {
+         this.config = config;
+         this.container = document.getElementById(config.containerId);
+         this.nameSpaces = [];
+         this.components = [];
+-        this.modal = new gridModal();
++        this.modal = new GridModal();
+         this.registeredScripts = [];
+         this.error = [];
+ 
+Index: src/service/GridComponent.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/GridComponent.js b/src/service/GridComponent/GridComponent.js
+rename from src/service/GridComponent.js
+rename to src/service/GridComponent/GridComponent.js
+--- a/src/service/GridComponent.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/service/GridComponent/GridComponent.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,3 +1,6 @@
++import {GridUi} from "../GridUi/GridUi";
++import {GridStage} from "../GridStage/GridStage";
++
+ export class GridComponent {
+     nameSpace;
+     componentId;
+@@ -116,7 +119,7 @@
+     }
+ 
+     createElementInstance(elementId, param) {
+-        if (typeof eval(elementId) !== 'udefined') {
++        if (typeof eval(elementId) !== 'undefined') {
+             const element = eval(elementId);
+ 
+             element.createInstance(this, ...param);
+Index: src/service/GridElement.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/GridElement.js b/src/service/GridElement/GridElement.js
+rename from src/service/GridElement.js
+rename to src/service/GridElement/GridElement.js
+--- a/src/service/GridElement.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/service/GridElement/GridElement.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,3 +1,5 @@
++import {GridStage} from "../GridStage/GridStage";
++
+ export class GridElement {
+     parent;
+     container;
+Index: src/service/GridModal.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/GridModal.js b/src/service/GridModal/GridModal.js
+rename from src/service/GridModal.js
+rename to src/service/GridModal/GridModal.js
+--- a/src/service/GridModal.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/service/GridModal/GridModal.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,4 +1,10 @@
+-export class gridModal {
++import "./gridModal.scss";
++import {GridUi} from "../GridUi/GridUi";
++import {GridStage} from "../GridStage/GridStage";
++
++import {modalService} from "../ModalForm/ModalForm";
++
++export class GridModal {
+     constructor() {
+         this.domConf = [{
+             selector: "gridModal", selectorAttr: "id", tag: "div",
+Index: style/gridModal.scss
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/style/gridModal.scss b/src/service/GridModal/gridModal.scss
+rename from style/gridModal.scss
+rename to src/service/GridModal/gridModal.scss
+--- a/style/gridModal.scss	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/service/GridModal/gridModal.scss	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,10 +1,12 @@
++@import "../../../config/theme";
++
+ #gridModal {
+   display: none;
+   position: absolute;
+   top: 0;
+   width: 100%;
+   z-index: 1000;
+-  font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
++  font-family: $font-text;
+ }
+ 
+ #grid-modal-bg {
+@@ -23,8 +25,7 @@
+   top: 200px;
+   left: 50%;
+   margin-left: -300px;
+-  width: 100%;
+-  border: 1px solid black;
++  border: $border;
+   z-index: 2;
+   background-color: #e5e5e5;
+ 
+Index: src/service/GridStage/GridStage.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/GridStage/GridStage.js b/src/service/GridStage/GridStage.js
+new file mode 100644
+--- /dev/null	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/service/GridStage/GridStage.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -0,0 +1,32 @@
++export class GridStage {
++    static modal = null;
++    static error = {};
++
++    constructor() {
++        // TODO: non static wäre besser
++    }
++
++    static getNameSpaceComponentAction(nameSpace, ...param2) {
++        return undefined;
++    }
++
++    static loadScript(param) {
++
++    }
++
++    static setError(s) {
++
++    }
++
++    static setNameSpaceComponentAction(nameSpace, ...param) {
++
++    }
++
++    static initElements(gridSelectContent, container, nameSpace) {
++
++    }
++
++    static initNameSpaces() {
++
++    }
++}
+Index: src/service/GridUi.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/GridUi.js b/src/service/GridUi/GridUi.js
+rename from src/service/GridUi.js
+rename to src/service/GridUi/GridUi.js
+--- a/src/service/GridUi.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/service/GridUi/GridUi.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,3 +1,5 @@
++import "./grid-container.scss";
++
+ export class GridUi {
+     static closest(selector, obj) {
+         const selectorArgs = (selector.match(/\./)) ? selector.split('.').slice(1) : [];
+@@ -52,11 +54,8 @@
+ 
+         if (obj.dataset.hasOwnProperty(key)) {
+ 
+-            result = true;
+ 
+-            if (value && this.dataSetValue(obj, key) !== value) {
+-                result = false;
+-            }
++            result = !(value && this.dataSetValue(obj, key) !== value);
+         }
+ 
+         return result;
+@@ -219,8 +218,8 @@
+ 
+             for (let i = 1; i <= list.length; i++) {
+                 const option = document.createElement("option");
+-                option.value = i;
+-                option.innerHTML = i;
++                option.value = i + "";
++                option.innerHTML = i + "";
+                 row.querySelector('select.sequence-select').appendChild(option);
+             }
+             row.querySelector('select.sequence-select').selectedIndex = containerIndex;
+Index: style/grid-container.scss
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/style/grid-container.scss b/src/service/GridUi/grid-container.scss
+rename from style/grid-container.scss
+rename to src/service/GridUi/grid-container.scss
+--- a/style/grid-container.scss	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/service/GridUi/grid-container.scss	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,3 +1,5 @@
++@import "../../../config/theme";
++
+ .grid-container {
+   width: calc(100% - 120px);
+   margin: 0 auto;
+Index: src/service/ModalForm.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/ModalForm.js b/src/service/ModalForm/ModalForm.js
+rename from src/service/ModalForm.js
+rename to src/service/ModalForm/ModalForm.js
+--- a/src/service/ModalForm.js	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ b/src/service/ModalForm/ModalForm.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,5 +1,8 @@
+ // TODO Diese Klasse ist noch schmutzig
+ 
++import {GridStage} from "../GridStage/GridStage";
++import {GridUi} from "../GridUi/GridUi";
++
+ modalService = {};
+ 
+ if (typeof ServiceModalForm === 'undefined') {
+@@ -56,4 +59,5 @@
+ 
+ }
+ modalForm = modalService
+-export var modalForm;
+\ No newline at end of file
++export var modalForm;
++export var modalService; // TODO aufräumen
+\ No newline at end of file
+Index: style/__TODO.md
+===================================================================
+diff --git a/style/__TODO.md b/style/__TODO.md
+deleted file mode 100644
+--- a/style/__TODO.md	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ /dev/null	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
+@@ -1,8 +0,0 @@
+-# todo
+-
+-Bitte den Style-Ordner komplett auflösen.
+-
+-Im src-Ordner sollte jede Klasse eine eigene JS-Datei haben.
+-
+-Und sollte es eine SCSS-Datei für eine Klasse geben, 
+-so muss die Klasse selbst das SCSS importieren. 
+\ No newline at end of file
+Index: style/index.scss
+===================================================================
+diff --git a/style/index.scss b/style/index.scss
+deleted file mode 100644
+--- a/style/index.scss	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
++++ /dev/null	(revision e75d0a546f32649abf89abc77a0ab0e8bb6983ee)
+@@ -1,6 +0,0 @@
+-@import "./dataTable.scss";
+-@import "./date-picker.scss";
+-@import "./grid-container.scss";
+-@import "./grid-sidenavi.scss";
+-@import "./gridModal.scss";
+-@import "./order-box-container.scss";
+\ No newline at end of file

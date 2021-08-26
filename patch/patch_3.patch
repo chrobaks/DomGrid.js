@@ -1,0 +1,1747 @@
+Index: TODO.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/TODO.md b/TODO.md
+new file mode 100644
+--- /dev/null	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
++++ b/TODO.md	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -0,0 +1,128 @@
++# TODO
++
++## Nice To Have
++
++### Flexibilität
++
++`config/theme.scss` und `config/config.js` enthalten ein paar Stellschrauben für die Entwickler 
++und sollten die Wiederverwendbarkeit dieses Bundles verbessern.
++
++### Überall DomGridUi nötig?
++
++Ich sprech mal jQuery:
++
++Wenn ich ein `$nodeElement` habe wie zB jQuery.find('#DomGrid'), dann hat dieses $nodeElement
++alle Methoden, die es in jQuery gibt. Damit kann ich dann Sachen machen wie:
++
++- $nodeElement.find('.cildNode')
++- $nodeElement.load(uriContent)
++- $nodeElement.closest('.parentNode')
++
++Das führt dazu, dass man jQuery selbst eigendlich gar nicht weiter benötigt.
++
++Sowas sollte man auch hier versuchen...
++
++Angenommen wir hätten in der DomGridConfig sowas:
++
++```js
++config.$container = DomGridUi.find('#DomGrid');
++```
++
++Dann bräuchten wir nirgendwo mehr die DomGridUi direkt zu referenzieren und es indirekt machen:
++
++```js
++$components = $container.find('[data-domgrid-component]')
++```
++
++## Code Review
++
++Hier ein paar Sachen, die aufgefallen sind und überarbeitet werden könnten.
++
++### Mehr Constructor Injection (aka "CI")
++
++Keine Globalen Klassen. Einzige Ausnahme wären so kleine Toolbelts wie `Math`.
++
++Es gibt zu viele Stellen, an denen sich Klassen selbst Daten oder Instanzen anderer Klassen holen.
++Besser wäre es, wenn es beim NEW-Statement explizit übergeben wird.
++
++```js
++var domGridConfig = new Config({
++    'ui': new Ui(UiConfig)
++});
++```
++
++oder falls du auf Getter und Setter stehst wäre das auch sehr schön:
++
++```js
++var domGridConfig = new Config();
++domGridConfig->setUI(new Ui(UiConfig));
++```
++
++Und dann:
++
++```js
++new Loader(domGridConfig);
++```
++
++... und im Code von DomGrid dann:
++```js
++constructor(config) {
++  this.config = config;
++}
++/**
++* returns UiService 
++*/
++getUi(){
++  return this.config.ui;
++  // bzw return this.config.getUi();
++}
++```
++
++Das ermöglicht eine saubere und strenge Typisierung, die von viele JS-Tools sehr eng geprüft werden kann 
++und ermöglicht besseres Pre-Compiling in modernen JS-Engines.
++
++### Variablen bzgl DOM-Lib
++
++Ich hätte gerne, dass es mehr wie jQuery aussieht und dass Variablennamen dann mit einem "$" anfangen.
++
++### Naming
++
++#### JS
++
++Ich würde das Prefix "Grid" weglassen und statt dessen die ParentKlasse mit in den Namen schreiben.
++
++alt: `GridEdit extends GridComponent`
++
++neu: `EditComponent extends Component`
++
++Oder gar komplett weglassen? `Edit extends Component` wäre schon cool. 
++Auch sähen dann die HTML Attribute besser aus: `data-domgrid-component="Edit"`
++
++#### CSS
++
++Ich habe es auch nach SCSS umgewandelt und bereits angefangen, es zu separieren.
++Das macht den Code übersichtlicher.
++
++Die CSS-Klassen und IDs sollten genau so heissen wie die JavaScript-Objekte. 
++Zudem würde ich alle CSS-Selectoren mit dem Namespace einengen:
++
++```scss
++#DomGrid {
++  .DomGrid-Edit{
++    display: block;   
++  }  
++}
++```
++
++Die SCSS-Datei sollte genauso heissen wie die JS-Datei, für die sie gedacht ist.
++
++```sh
++  DomGrid-Edit.js
++  DomGrid-Edit.scss
++```
++
++### Separation 
++
++Eine JS-Klasse pro Datei.
++Jede JS-Klasse kann ihr eigenes SCSS mitbringen.
++Jede JS-Klasse kann weitere JS-Klassen anfordern. Aber dran denken: Besser als CI umsetzen! 
+Index: config/config.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/config/config.js b/config/config.js
+new file mode 100644
+--- /dev/null	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
++++ b/config/config.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -0,0 +1,7 @@
++import {Config} from "../src/service/Config/DomGridConfig";
++
++let customDomGridConfig = Config;
++
++config.env = "TEST";
++
++export const config = customDomGridConfig;
+\ No newline at end of file
+Index: config/test.js
+===================================================================
+diff --git a/config/test.js b/config/test.js
+deleted file mode 100644
+--- a/config/test.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ /dev/null	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,4 +0,0 @@
+-export const config = {
+-    'test': true,
+-    'containerId' : '#container'
+-}
+\ No newline at end of file
+Index: index.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/index.html b/index.html
+--- a/index.html	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/index.html	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,11 +1,9 @@
+ <!DOCTYPE html>
+-<html>
++<html lang="de">
+     <head>
+         <meta charset="utf-8" />
+-        <title>Webpack App</title>
++        <title>DomGrid</title>
+     </head>
+-    <body>
+-        <h1>Hello world!</h1>
+-        <h2>Tip: Check your console</h2>
++    <body data-domgrid>
+     </body>
+ </html>
+Index: src/component/GridDataTable/DataTable.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTable/DataTable.js b/src/component/DataTable/DataTable.js
+rename from src/component/GridDataTable/DataTable.js
+rename to src/component/DataTable/DataTable.js
+--- a/src/component/GridDataTable/DataTable.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/DataTable/DataTable.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -4,7 +4,7 @@
+ import {DataTableView} from "./DataTableView";
+ import {DataTableToolBar} from "./DataTableToolBar";
+ import {DataTableConf} from "./DataTableConf";
+-import {GridUi} from "../../service/GridUi/GridUi";
++import {Ui} from "../../service/Ui/GridUi";
+ 
+ export class DataTable {
+     constructor(container, config) {
+@@ -55,7 +55,7 @@
+ 
+         // Send ajax request
+         xhttp.open("POST", this.config.ajaxUrl, true);
+-        xhttp.send(GridUi.formData(formData));
++        xhttp.send(Ui.formData(formData));
+         xhttp.onreadystatechange = function () {
+             if (this.readyState == 4 && this.status == 200) {
+                 const responseData = JSON.parse(this.responseText);
+Index: src/component/GridDataTable/DataTableComponent.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTable/DataTableComponent.js b/src/component/DataTable/DataTableComponent.js
+rename from src/component/GridDataTable/DataTableComponent.js
+rename to src/component/DataTable/DataTableComponent.js
+--- a/src/component/GridDataTable/DataTableComponent.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/DataTable/DataTableComponent.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,8 +1,8 @@
+-import {GridComponent} from "../../service/GridComponent/GridComponent";
++import {Component} from "../../service/Component/Component";
+ import {DataTable} from "./DataTable";
+-import {GridDatePicker} from "../GridDatePicker/GridDatePicker";
++import {DatePicker} from "../DatePicker/DatePicker";
+ 
+-export class DataTableComponent extends GridComponent {
++export class DataTableComponent extends Component {
+     constructor(obj, nameSpace, callerInput) {
+         super(obj, nameSpace);
+ 
+@@ -25,7 +25,7 @@
+     }
+ 
+     setDatepicker(obj) {
+-        GridDatePicker.createInstance(this.nameSpace, obj);
++        DatePicker.createInstance(this.nameSpace, obj);
+     }
+ 
+     refreshDataTable() {
+Index: src/component/GridDataTable/DataTableSearch.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTable/DataTableSearch.js b/src/component/DataTable/DataTableSearch.js
+rename from src/component/GridDataTable/DataTableSearch.js
+rename to src/component/DataTable/DataTableSearch.js
+--- a/src/component/GridDataTable/DataTableSearch.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/DataTable/DataTableSearch.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,4 +1,4 @@
+-import {DataTableUtile} from "../GridDataTableNew/DataTableUtile";
++import {DataTableUtile} from "../DataTableNew/DataTableUtile";
+ 
+ export class DataTableSearch {
+     constructor() {
+Index: src/component/GridDataTable/DataTableToolBar.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTable/DataTableToolBar.js b/src/component/DataTable/DataTableToolBar.js
+rename from src/component/GridDataTable/DataTableToolBar.js
+rename to src/component/DataTable/DataTableToolBar.js
+--- a/src/component/GridDataTable/DataTableToolBar.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/DataTable/DataTableToolBar.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,5 +1,5 @@
+ import "./dataTableToolBar.scss";
+-import {DataTableUtile} from "../GridDataTableNew/DataTableUtile";
++import {DataTableUtile} from "../DataTableNew/DataTableUtile";
+ 
+ export class DataTableToolBar {
+     constructor(DataTable) {
+Index: src/component/GridDataTable/DataTableUtils.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTable/DataTableUtils.js b/src/component/DataTable/DataTableUtils.js
+rename from src/component/GridDataTable/DataTableUtils.js
+rename to src/component/DataTable/DataTableUtils.js
+--- a/src/component/GridDataTable/DataTableUtils.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/DataTable/DataTableUtils.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,4 +1,4 @@
+-import {DataTableUtile} from "../GridDataTableNew/DataTableUtile";
++import {DataTableUtile} from "../DataTableNew/DataTableUtile";
+ 
+ export class DataTableUtils {
+     static getStrNumber(i, str) {
+Index: src/component/GridDataTableNew/GridDataTableNew.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDataTableNew/GridDataTableNew.js b/src/component/DataTableNew/DataTableNew.js
+rename from src/component/GridDataTableNew/GridDataTableNew.js
+rename to src/component/DataTableNew/DataTableNew.js
+--- a/src/component/GridDataTableNew/GridDataTableNew.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/DataTableNew/DataTableNew.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,11 +1,11 @@
+ import "./order-box-container.scss";
+ 
+-import {GridComponent} from "../../service/GridComponent/GridComponent";
++import {Component} from "../../service/Component/Component";
+ 
+ import {DataTable} from "./DataTable";
+-import {GridDatePicker} from "../GridDatePicker/GridDatePicker";
++import {DatePicker} from "../DatePicker/DatePicker";
+ 
+-export class GridDataTableNew extends GridComponent {
++export class DataTableNew extends Component {
+     constructor(obj, nameSpace, callerInput) {
+         super(obj, nameSpace);
+ 
+@@ -20,7 +20,7 @@
+     }
+ 
+     setDatepicker(obj) {
+-        GridDatePicker.createInstance(this.nameSpace, obj);
++        DatePicker.createInstance(this.nameSpace, obj);
+     }
+ 
+     refreshDataTable() {
+Index: src/component/GridDatePicker/GridDatePicker.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridDatePicker/GridDatePicker.js b/src/component/DatePicker/DatePicker.js
+rename from src/component/GridDatePicker/GridDatePicker.js
+rename to src/component/DatePicker/DatePicker.js
+--- a/src/component/GridDatePicker/GridDatePicker.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/DatePicker/DatePicker.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,8 +1,8 @@
+-import {GridComponent} from "../../service/GridComponent/GridComponent";
++import {Component} from "../../service/Component/Component";
+ import "./date-picker.scss";
+-import {GridUi} from "../../service/GridUi/GridUi";
++import {Ui} from "../../service/Ui/GridUi";
+ 
+-export class GridDatePicker extends GridComponent {
++export class DatePicker extends Component {
+     constructor(obj, nameSpace, callerInput) {
+         super(obj, nameSpace);
+ 
+@@ -42,13 +42,13 @@
+ 
+     static createInstance(nameSpace, obj) {
+         // Set obj parent postion to relativ
+-        const objContaner = GridUi.closest('div', obj);
++        const objContaner = Ui.closest('div', obj);
+         objContaner.style.position = "relative";
+ 
+         // Create Datepicker template
+         const datePickerContainer = document.createElement("d");
+         datePickerContainer.classList.add('date-picker');
+-        datePickerContainer.innerHTML = GridDatePicker.getTpl();
++        datePickerContainer.innerHTML = DatePicker.getTpl();
+         datePickerContainer.style.top = "0";
+         datePickerContainer.style.zIndex = "1000";
+         datePickerContainer.style.display = "block";
+@@ -56,8 +56,8 @@
+         // Append to obj parent element
+         objContaner.appendChild(datePickerContainer);
+ 
+-        // Initiallize GridDatePicker Instance
+-        let Inst = new GridDatePicker(datePickerContainer, nameSpace, obj);
++        // Initiallize DatePicker Instance
++        let Inst = new DatePicker(datePickerContainer, nameSpace, obj);
+ 
+         // Hide Datepicker
+         datePickerContainer.onmouseleave = () => {
+@@ -140,7 +140,7 @@
+     }
+ 
+     setCallerInput(obj) {
+-        this.callerInput.value = [GridUi.dataSetValue(obj, "value"), this.labelMonth.dataset.value, this.labelYear.dataset.value].join('.');
++        this.callerInput.value = [Ui.dataSetValue(obj, "value"), this.labelMonth.dataset.value, this.labelYear.dataset.value].join('.');
+         if (this.itemsContainer.querySelectorAll(".item.active").length) {
+             this.itemsContainer.querySelectorAll(".item.active")[0].classList.remove('active');
+         }
+Index: src/component/GridEdit/GridEdit.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridEdit/GridEdit.js b/src/component/EditModal/EditModal.js
+rename from src/component/GridEdit/GridEdit.js
+rename to src/component/EditModal/EditModal.js
+--- a/src/component/GridEdit/GridEdit.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/EditModal/EditModal.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,8 +1,8 @@
+-import {GridComponent} from "../../service/GridComponent/GridComponent";
+-import {GridUi} from "../../service/GridUi/GridUi";
++import {Component} from "../../service/Component/Component";
++import {Ui} from "../../service/Ui/GridUi";
+ import {GridStage} from "../../service/GridStage/GridStage";
+ 
+-export class GridEdit extends GridComponent {
++export class EditModal extends Component {
+     constructor(obj, nameSpace) {
+         super(obj, nameSpace);
+ 
+@@ -15,10 +15,10 @@
+ 
+     setModal(obj) {
+         const callBack = {obj: this, method: "setModalRequest"};
+-        const url = GridUi.dataSetValue(obj, 'requestUrl');
++        const url = Ui.dataSetValue(obj, 'requestUrl');
+ 
+         // Set triggerUrl for modalRequest
+-        this.requestTriggerUrl = GridUi.dataSetValue(obj, 'triggerUrl');
++        this.requestTriggerUrl = Ui.dataSetValue(obj, 'triggerUrl');
+         GridStage.modal.modalTitle("Daten bearbeiten");
+         GridStage.modal.modalRequest({url: url}, {callBack: callBack});
+     }
+@@ -28,22 +28,22 @@
+         this.setMessage("Die Daten werden gespeichert, bitte warten ..");
+ 
+         // Send post request
+-        this.setComponentRequest("postRequest", {url: this.requestTriggerUrl, formData: GridUi.formData(formData), response: "setModalResponse"});
++        this.setComponentRequest("postRequest", {url: this.requestTriggerUrl, formData: Ui.formData(formData), response: "setModalResponse"});
+     }
+ 
+     setModalResponse(res) {
+         // Set response message
+         this.setMessage(res);
+ 
+-        if (GridUi.requestStatus(res)) {
++        if (Ui.requestStatus(res)) {
+             this.renderDataset(res.data);
+         }
+     }
+ 
+     renderDataset(data) {
+-        GridUi.renderDatasetList(this.container.querySelectorAll('[data-grid-edit-key]'), data);
++        Ui.renderDatasetList(this.container.querySelectorAll('[data-grid-edit-key]'), data);
+         [...this.container.querySelectorAll('[data-grid-edit-param]')].map(obj => {
+-            const key = GridUi.dataSetValue(obj, "gridEditParam");
++            const key = Ui.dataSetValue(obj, "gridEditParam");
+             if (key && data.hasOwnProperty(key)) {
+                 obj.dataset[key] = data[key];
+             }
+Index: src/component/GridExampleModal/GridExampleModal.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridExampleModal/GridExampleModal.js b/src/component/ExampleModal/ExampleModal.js
+rename from src/component/GridExampleModal/GridExampleModal.js
+rename to src/component/ExampleModal/ExampleModal.js
+--- a/src/component/GridExampleModal/GridExampleModal.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/ExampleModal/ExampleModal.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,7 +1,7 @@
+-import {GridComponent} from "../../service/GridComponent/GridComponent";
++import {Component} from "../../service/Component/Component";
+ import {GridStage} from "../../service/GridStage/GridStage";
+ 
+-export class GridExampleModal extends GridComponent {
++export class ExampleModal extends Component {
+     constructor(obj, nameSpace) {
+         super(obj, nameSpace);
+ 
+Index: src/component/GridForm/GridForm.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridForm/GridForm.js b/src/component/Form/Form.js
+rename from src/component/GridForm/GridForm.js
+rename to src/component/Form/Form.js
+--- a/src/component/GridForm/GridForm.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/Form/Form.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,8 +1,8 @@
+-import {GridComponent} from "../../service/GridComponent/GridComponent";
+-import {GridDatePicker} from "../GridDatePicker/GridDatePicker";
+-import {GridUi} from "../../service/GridUi/GridUi";
++import {Component} from "../../service/Component/Component";
++import {DatePicker} from "../DatePicker/DatePicker";
++import {Ui} from "../../service/Ui/GridUi";
+ 
+-export class GridForm extends GridComponent {
++export class Form extends Component {
+     constructor(obj, nameSpace) {
+         super(obj, nameSpace);
+ 
+@@ -26,7 +26,7 @@
+         const formList = [...this.container.querySelectorAll("input"), ...this.container.querySelectorAll("select"), ...this.container.querySelectorAll("textarea")];
+ 
+         // Get form validation
+-        const error = GridUi.checkFormValidation(formList);
++        const error = Ui.checkFormValidation(formList);
+         console.log("error", error);
+         // If empty required fields exists
+         if (error.length) {
+@@ -40,17 +40,17 @@
+             return false;
+         } else { // Send Ajax Request
+             // Set formData
+-            const formResults = GridUi.formListToData(formList);
++            const formResults = Ui.formListToData(formList);
+ 
+             // Set request message
+             this.setMessage("Die Daten werden gespeichert, bitte warten ..");
+ 
+             // Send post request
+-            // this.setComponentRequest("postRequest", {url : GridUi.dataSetValue(obj, "requestUrl"), formData : formResults.formData, response : "setResponse"});
++            // this.setComponentRequest("postRequest", {url : Ui.dataSetValue(obj, "requestUrl"), formData : formResults.formData, response : "setResponse"});
+         }
+     }
+ 
+     setDatepicker(obj) {
+-        GridDatePicker.createInstance(this.nameSpace, obj);
++        DatePicker.createInstance(this.nameSpace, obj);
+     }
+ } 
+\ No newline at end of file
+Index: src/component/GridFormList/GridFormList.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridFormList/GridFormList.js b/src/component/FormList/FormList.js
+rename from src/component/GridFormList/GridFormList.js
+rename to src/component/FormList/FormList.js
+--- a/src/component/GridFormList/GridFormList.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/FormList/FormList.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,8 +1,8 @@
+-import {GridComponent} from "../../service/GridComponent/GridComponent";
+-import {GridUi} from "../../service/GridUi/GridUi";
++import {Component} from "../../service/Component/Component";
++import {Ui} from "../../service/Ui/GridUi";
+ import {GridStage} from "../../service/GridStage/GridStage";
+ 
+-export class GridFormList extends GridComponent {
++export class FormList extends Component {
+     constructor(obj, nameSpace) {
+         super(obj, nameSpace);
+ 
+@@ -15,10 +15,10 @@
+ 
+     setModal(obj) {
+         const callBack = {obj: this, method: "setModalRequest"};
+-        const url = GridUi.dataSetValue(obj, 'requestUrl');
++        const url = Ui.dataSetValue(obj, 'requestUrl');
+ 
+         // Set triggerUrl for modalRequest
+-        this.requestTriggerUrl = GridUi.dataSetValue(obj, 'triggerUrl');
++        this.requestTriggerUrl = Ui.dataSetValue(obj, 'triggerUrl');
+         GridStage.modal.modalTitle("Neue Daten");
+         GridStage.modal.modalRequest({url: url}, {callBack: callBack});
+     }
+@@ -28,14 +28,14 @@
+         this.setMessage("Die Daten werden gespeichert, bitte warten ..");
+ 
+         // Send post request
+-        this.setComponentRequest("postRequest", {url: this.requestTriggerUrl, formData: GridUi.formData(formData), response: "setModalResponse"});
++        this.setComponentRequest("postRequest", {url: this.requestTriggerUrl, formData: Ui.formData(formData), response: "setModalResponse"});
+     }
+ 
+     setModalResponse(res) {
+         // Set response message
+         this.setMessage(res);
+ 
+-        if (GridUi.requestStatus(res)) {
++        if (Ui.requestStatus(res)) {
+             this.setComponentRequest("tplRequest", {url: this.containerUrl, response: "renderBody"});
+         }
+     }
+Index: src/component/GridSelectContent/GridSelectContent.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridSelectContent/GridSelectContent.js b/src/component/SelectContent/SelectContent.js
+rename from src/component/GridSelectContent/GridSelectContent.js
+rename to src/component/SelectContent/SelectContent.js
+--- a/src/component/GridSelectContent/GridSelectContent.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/SelectContent/SelectContent.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,8 +1,8 @@
+-import {GridComponent} from "../../service/GridComponent/GridComponent";
+-import {GridUi} from "../../service/GridUi/GridUi";
++import {Component} from "../../service/Component/Component";
++import {Ui} from "../../service/Ui/GridUi";
+ import {GridStage} from "../../service/GridStage/GridStage";
+ 
+-export class GridSelectContent extends GridComponent {
++export class SelectContent extends Component {
+     requestSelectId;
+ 
+     constructor(obj, nameSpace) {
+@@ -22,7 +22,7 @@
+     }
+ 
+     setRequest(obj) {
+-        this.requestSelectId.push(GridUi.dataSetValue(obj, 'gridSelectId'));
++        this.requestSelectId.push(Ui.dataSetValue(obj, 'gridSelectId'));
+         this.setComponentRequest("tplRequest", {url: obj.value, response: "renderBody"});
+     }
+ 
+Index: src/component/GridSideNavi/GridSideNavi.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/component/GridSideNavi/GridSideNavi.js b/src/component/SideNavi/SideNavi.js
+rename from src/component/GridSideNavi/GridSideNavi.js
+rename to src/component/SideNavi/SideNavi.js
+--- a/src/component/GridSideNavi/GridSideNavi.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/component/SideNavi/SideNavi.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,8 +1,8 @@
+-import {GridComponent} from "../../service/GridComponent/GridComponent";
++import {Component} from "../../service/Component/Component";
+ import "./grid-sidenavi.scss";
+-import {GridUi} from "../../service/GridUi/GridUi";
++import {Ui} from "../../service/Ui/GridUi";
+ 
+-class GridSideNavi extends GridComponent {
++export class SideNavi extends Component {
+     selectedIndex; // Active content index
+     config; // Slide settings
+ 
+@@ -34,7 +34,7 @@
+         // New container (left,right,bottom,top) value
+         const slideTo = (this.container.style[this.config.slideFrom] === '' || this.container.style[this.config.slideFrom] === -this.config.slideOut + 'px') ? this.config.slideIn : -this.config.slideOut;
+         // Get menu item index
+-        const index = GridUi.getIndex(this.container.querySelector('ul.sidenavi-menu'), 'li', GridUi.closest('li', obj));
++        const index = Ui.getIndex(this.container.querySelector('ul.sidenavi-menu'), 'li', Ui.closest('li', obj));
+         // If sidenavi is closed or menu index changed
+         if (this.selectedIndex !== index) {
+             // Set selectedIndex from obj index
+Index: src/element/GridModalTplElement/GridModalTplElement.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/element/GridModalTplElement/GridModalTplElement.js b/src/element/AngryDuck/AngryDuck.js
+rename from src/element/GridModalTplElement/GridModalTplElement.js
+rename to src/element/AngryDuck/AngryDuck.js
+--- a/src/element/GridModalTplElement/GridModalTplElement.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/element/AngryDuck/AngryDuck.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,8 +1,8 @@
+-import {GridUi} from "../../service/GridUi/GridUi";
+-import {GridElement} from "../../service/GridElement/GridElement";
++import {Ui} from "../../service/Ui/GridUi";
++import {Element} from "../../service/Element/Element";
+ import {GridStage} from "../../service/GridStage/GridStage";
+ 
+-export class GridModalTplElement extends GridElement {
++export class AngryDuck extends Element {
+     constructor(container, parent) {
+         super(container, parent);
+ 
+@@ -14,7 +14,7 @@
+     }
+ 
+     setModal(obj) {
+-        const url = GridUi.dataSetValue(obj, 'requestUrl');
++        const url = Ui.dataSetValue(obj, 'requestUrl');
+ 
+         // Set modal title
+         GridStage.modal.modalTitle("AngryDuckForum");
+Index: src/element/GridLinkElement/GridLinkElement.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/element/GridLinkElement/GridLinkElement.js b/src/element/Link/Link.js
+rename from src/element/GridLinkElement/GridLinkElement.js
+rename to src/element/Link/Link.js
+--- a/src/element/GridLinkElement/GridLinkElement.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/element/Link/Link.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,13 +1,13 @@
+-import {GridUi} from "../../service/GridUi/GridUi";
+-import {GridElement} from "../../service/GridElement/GridElement";
++import {Ui} from "../../service/Ui/GridUi";
++import {Element} from "../../service/Element/Element";
+ 
+-export class GridLinkElement extends GridElement {
++export class Link extends Element {
+     action;
+ 
+     constructor(container, parent) {
+         super(container, parent);
+         // Link action method name
+-        this.action = GridUi.dataSetValue(this.container, 'action');
++        this.action = Ui.dataSetValue(this.container, 'action');
+         // Click event
+         this.container.onclick = () => {
+             if (this.action && typeof this[this.action] !== 'undefined') {
+@@ -17,8 +17,8 @@
+     }
+ 
+     replaceUrl() {
+-        const path = GridUi.dataSetValue(this.container, 'requestUrl');
+-        const param = GridUi.dataSetValue(this.container, 'requestParam');
++        const path = Ui.dataSetValue(this.container, 'requestUrl');
++        const param = Ui.dataSetValue(this.container, 'requestParam');
+         // Call new href
+         if (path) {
+             this.container.href = path.replace('0', param);
+Index: src/element/GridRowElement/GridRowElement.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/element/GridRowElement/GridRowElement.js b/src/element/Row/Row.js
+rename from src/element/GridRowElement/GridRowElement.js
+rename to src/element/Row/Row.js
+--- a/src/element/GridRowElement/GridRowElement.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/element/Row/Row.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,8 +1,8 @@
+-import {GridElement} from "../../service/GridElement/GridElement";
+-import {GridUi} from "../../service/GridUi/GridUi";
++import {Element} from "../../service/Element/Element";
++import {Ui} from "../../service/Ui/GridUi";
+ import {GridStage} from "../../service/GridStage/GridStage";
+ 
+-export class GridRowElement extends GridElement {
++export class Row extends Element {
+     constructor(container, parent) {
+         super(container, parent);
+ 
+@@ -16,9 +16,9 @@
+ 
+     setDeleteRow(obj) {
+         // Row request url
+-        const url = GridUi.dataSetValue(obj, 'requestUrl');
++        const url = Ui.dataSetValue(obj, 'requestUrl');
+         const csrfInpt = this.container.querySelector('input[name="_token"]');
+-        const formData = (csrfInpt) ? GridUi.formData({"_token": csrfInpt.value}) : [];
++        const formData = (csrfInpt) ? Ui.formData({"_token": csrfInpt.value}) : [];
+ 
+         // Confirm delete action
+         if (url && confirm("Möchtest du wirklich diese Daten löschen?")) {
+@@ -36,17 +36,17 @@
+ 
+     setResponse(response) {
+         // Delete row, if response.status is success
+-        if (GridUi.requestStatus(response)) {
++        if (Ui.requestStatus(response)) {
+             this.container.remove();
+         }
+     }
+ 
+     setModal(obj) {
+         const callBack = {obj: this, method: "setModalRequest"};
+-        const url = GridUi.dataSetValue(obj, 'requestUrl');
++        const url = Ui.dataSetValue(obj, 'requestUrl');
+ 
+         // Set triggerUrl for modalRequest
+-        this.requestTriggerUrl = GridUi.dataSetValue(obj, 'triggerUrl');
++        this.requestTriggerUrl = Ui.dataSetValue(obj, 'triggerUrl');
+         // Set modal title
+         GridStage.modal.modalTitle("Daten bearbeiten");
+         // Set modal request, load html template
+@@ -57,20 +57,20 @@
+         // Set request message
+         this.setParentAction('setMessage', "Die Daten werden gespeichert, bitte warten ..");
+         // Send post request
+-        this.setElementRequest("postRequest", {url: this.requestTriggerUrl, formData: GridUi.formData(formData), response: "setModalResponse"});
++        this.setElementRequest("postRequest", {url: this.requestTriggerUrl, formData: Ui.formData(formData), response: "setModalResponse"});
+     }
+ 
+     setModalResponse(res) {
+         // Set response message
+         this.setParentAction('setMessage', res);
+         // If response status is success, update row data
+-        if (GridUi.requestStatus(res)) {
++        if (Ui.requestStatus(res)) {
+             this.renderBody(res.data);
+         }
+     }
+ 
+     renderBody(data) {
+         // Render new element data with attribute data-grid-edit-key
+-        GridUi.renderDatasetList(this.container.querySelectorAll('[data-grid-edit-key]'), data);
++        Ui.renderDatasetList(this.container.querySelectorAll('[data-grid-edit-key]'), data);
+     }
+ }
+\ No newline at end of file
+Index: src/index.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/index.js b/src/index.js
+--- a/src/index.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/index.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,8 +1,4 @@
+-import {DomGrid} from "./service/DomGrid/DomGrid";
+-import {config} from "../config/test";
++import {Loader} from "./service/Loader/Loader";
++import {config} from "../config/config";
+ 
+-new DomGrid(config); // geil oder? :D
+-
+-// Der Service DomGrid läd andere Services/Klassen
+-// und jeder Service und jede Klasse kann dann "ihr" SCSS nachladen
+-// Und jeder Service kann natürlich seinerseits andere Services/Klassen anfordern
+\ No newline at end of file
++new Loader(config);
+Index: src/namespace/Global/Global.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/namespace/Global/Global.js b/src/namespace/Global/Global.js
+new file mode 100644
+--- /dev/null	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
++++ b/src/namespace/Global/Global.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -0,0 +1,5 @@
++import {Namespace} from "../../service/Namespace/Namespace";
++
++export class Global extends Namespace {
++
++}
+\ No newline at end of file
+Index: src/service/GridComponent/GridComponent.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/GridComponent/GridComponent.js b/src/service/Component/Component.js
+rename from src/service/GridComponent/GridComponent.js
+rename to src/service/Component/Component.js
+--- a/src/service/GridComponent/GridComponent.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/service/Component/Component.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,7 +1,7 @@
+-import {GridUi} from "../GridUi/GridUi";
++import {Ui} from "../Ui/GridUi";
+ import {GridStage} from "../GridStage/GridStage";
+ 
+-export class GridComponent {
++export class Component {
+     nameSpace;
+     componentId;
+     container;
+@@ -12,12 +12,13 @@
+ 
+     constructor(container, nameSpace) {
+         this.nameSpace = nameSpace;
+-        this.componentId = container.dataset.gridComponent;
++        this.componentId = container.dataset.Component;
+         this.container = container;
+         this.eventConfig = [];
+         this.state = {};
++        this.elements = [];
+         this.stateOk = true;
+-        this.containerUrl = GridUi.dataSetValue(this.container, 'containerUrl');
++        this.containerUrl = Ui.dataSetValue(this.container, 'containerUrl');
+     }
+ 
+     setEvents() {
+Index: src/service/Config/Config.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/Config/Config.js b/src/service/Config/Config.js
+new file mode 100644
+--- /dev/null	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
++++ b/src/service/Config/Config.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -0,0 +1,53 @@
++import {Ui} from "../Ui/Ui";
++import {Node} from "../Node/Node";
++
++import {Global} from "../../namespace/Global/Global";
++
++import {EditModal} from "../../component/EditModal/EditModal";
++import {DataTable} from "../../component/DataTableNew/DataTable";
++import {ExampleModal} from "../../component/ExampleModal/ExampleModal";
++import {DatePicker} from "../../component/DatePicker/DatePicker";
++import {Form} from "../../component/Form/Form";
++import {FormList} from "../../component/FormList/FormList";
++import {SelectContent} from "../../component/SelectContent/SelectContent";
++import {SideNavi} from "../../component/SideNavi/SideNavi";
++
++import {Link} from "../../element/Link/Link";
++import {AngryDuck} from "../../element/AngryDuck/AngryDuck";
++import {Row} from "../../element/Row/Row";
++
++let $document = new Node(window.document);
++
++export var Config = {
++
++    $document: $document,
++    $container: $document.find('[data-domgrid]'),
++
++    namespaces: {
++        'GlobalNamespace': Global,
++    },
++    components: {
++        'DataTable': DataTable, // Hier werden nur Constructors gemapped - wie bekommen wir die Config in die Instanz?
++        'GridDatePicker': DatePicker,
++        'GridEdit': EditModal,
++        'GridExampleModal': ExampleModal,
++        'GridForm': Form,
++        'GridFormList': FormList,
++        'GridSelectContent': SelectContent,
++        'GridSideNavi': SideNavi,
++    },
++    elements: {
++        'GridLinkElement': Link,
++        'GridModalTplElement': AngryDuck,
++        'GridRowElement': Row,
++    },
++    service: {
++        'ui': Ui,
++        'node': Node
++        // was macht hier Sinn?
++    },
++
++    getScriptUri: function (name, group) {
++        return 'dist/' + group + '/' + name + '/' + name + '.js';
++    }
++}
+\ No newline at end of file
+Index: src/service/DomGrid/DomGrid.js
+===================================================================
+diff --git a/src/service/DomGrid/DomGrid.js b/src/service/DomGrid/DomGrid.js
+deleted file mode 100644
+--- a/src/service/DomGrid/DomGrid.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ /dev/null	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
+@@ -1,216 +0,0 @@
+-import {GridModal} from "../GridModal/GridModal";
+-import {GridUi} from "../GridUi/GridUi";
+-import {GridStage} from "../GridStage/GridStage";
+-
+-export class DomGrid {
+-    scriptPath; // TODO
+-
+-    constructor(config) {
+-        this.config = config;
+-        this.container = document.getElementById(config.containerId);
+-        this.nameSpaces = [];
+-        this.components = [];
+-        this.modal = new GridModal();
+-        this.registeredScripts = [];
+-        this.error = [];
+-
+-        // Load required js
+-        if (this.initScriptLoader()) {
+-            this.loadScript(0);
+-        }
+-    }
+-
+-    initScriptLoader() {
+-        const list = [...this.container.querySelectorAll("[data-grid-component]"), ...this.container.querySelectorAll("[data-grid-element]")];
+-        const listRequired = [...this.container.querySelectorAll("[data-grid-required]")];
+-
+-        if (listRequired.length) {
+-            listRequired.map((obj) => {
+-
+-                const scriptName = "component/" + GridUi.dataSetValue(obj, "gridRequired");
+-
+-                if (!this.registeredScripts.includes(scriptName)) {
+-                    this.registeredScripts.push(scriptName);
+-                }
+-            });
+-        }
+-
+-        list.map((obj) => {
+-            const scriptName = (GridUi.dataSetValue(obj, "gridComponent") !== "")
+-                ? "component/" + GridUi.dataSetValue(obj, "gridComponent")
+-                : "element/" + GridUi.dataSetValue(obj, "gridElement");
+-
+-            if (!this.registeredScripts.includes(scriptName)) {
+-                this.registeredScripts.push(scriptName);
+-            }
+-
+-        });
+-
+-        return !!(this.registeredScripts.length);
+-    }
+-
+-    initNameSpaces() {
+-        const list = document.querySelectorAll("[data-grid-name-space]");
+-
+-        if (list.length) {
+-            [...list].map((obj) => {
+-                this.nameSpaces[obj.dataset.gridNameSpace] = {components: this.initComponents(obj)};
+-            });
+-        }
+-    }
+-
+-    initComponents(space) {
+-
+-        const list = (GridUi.dataSetValue(space, "gridComponent") === "") ? space.querySelectorAll("[data-grid-component]") : [space];
+-        const result = [];
+-
+-        if (list.length) {
+-
+-            [...list].map((obj) => {
+-                if (typeof eval(obj.dataset.gridComponent) !== undefined) {
+-
+-                    const component = eval(obj.dataset.gridComponent);
+-                    const componentInstance = new component(obj, space.dataset.gridNameSpace);
+-                    const id = (GridUi.dataSetValue(obj, 'gridComponentId')) ? GridUi.dataSetValue(obj, 'gridComponentId') : obj.dataset.gridComponent;
+-
+-                    result[id] = componentInstance;
+-
+-                    if (obj.querySelectorAll("[data-grid-element]").length) {
+-
+-                        this.initElements(componentInstance, obj, space.dataset.gridNameSpace);
+-                    }
+-                }
+-            });
+-        }
+-
+-        return result;
+-    }
+-
+-    initElements(componentInstance, component, parentNameSpace) {
+-        // Element list with attribute data-grid-element
+-        const list = component.querySelectorAll("[data-grid-element]");
+-
+-        if (list.length) {
+-            [...list].map((obj) => {
+-                // Select closest component as parent component
+-                const parent = GridUi.closest("[data-grid-component]", obj);
+-                // If parent exists
+-                if (parent && parent.dataset.gridComponent === component.dataset.gridComponent) {
+-                    // If element object exists
+-                    if (typeof eval(obj.dataset.gridElement) !== 'undefined') {
+-                        // Create object instance
+-                        const element = eval(obj.dataset.gridElement);
+-
+-                        new element(obj, {componentInstance: componentInstance, nameSpace: parentNameSpace, componentId: component.dataset.gridComponent});
+-                    }
+-                }
+-            });
+-        }
+-    }
+-
+-    loadScript(scriptIndex) {
+-        const script = document.createElement('script');
+-        const registeredScripts = this.registeredScripts;
+-        // Script onload event
+-        script.onload = function () {
+-            if (scriptIndex + 1 < registeredScripts.length) {
+-                GridStage.loadScript(scriptIndex + 1);
+-            } else {
+-                // If script loading went wrong
+-                if (GridStage.error.length) {
+-                    alert(GridStage.error.join("\n"));
+-                } else {
+-                    GridStage.initNameSpaces();
+-                }
+-            }
+-        };
+-
+-        script.onerror = function () {
+-            GridStage.setError("JS-Script kann nicht geladen werden: " + script.src);
+-        };
+-
+-        script.src = this.config.scriptPath + this.registeredScripts[scriptIndex] + ".js?" + Date.now();
+-
+-        document.querySelector("head").appendChild(script);
+-    }
+-
+-    postRequest(request) {
+-        const xhttp = new XMLHttpRequest();
+-        const _this = this;
+-        xhttp.open("POST", request.url, true);
+-        xhttp.send(request.formData);
+-        xhttp.onreadystatechange = function () {
+-            if (this.readyState == 4 && this.status == 200) {
+-
+-                const responseData = JSON.parse(this.responseText);
+-
+-                const status = (responseData.hasOwnProperty('status')) ? responseData.status : '';
+-
+-                if (request.hasOwnProperty('response')) {
+-                    request.component[request.response](responseData);
+-                }
+-            }
+-        };
+-    }
+-
+-    tplRequest(request) {
+-        const _this = this;
+-        const xhttp = new XMLHttpRequest();
+-
+-        xhttp.open("GET", request.url, true);
+-        xhttp.onreadystatechange = function () {
+-            if (this.readyState == 4 && this.status == 200) {
+-
+-                const status = GridUi.getJsonFromStr('status', this.responseText);
+-
+-                if (request.hasOwnProperty('response')) {
+-                    request.component[request.response](this.responseText);
+-                }
+-            }
+-        };
+-
+-        xhttp.send();
+-    }
+-
+-    setNameSpaceComponentAction(nameSpaceId, componentId, method) {
+-        if (this.nameSpaces.hasOwnProperty(nameSpaceId) && this.nameSpaces[nameSpaceId].components.hasOwnProperty(componentId)) {
+-
+-            const component = this.nameSpaces[nameSpaceId].components[componentId];
+-
+-            if (typeof component[method] === 'function') {
+-                if (arguments.length > 3) {
+-                    component[method](arguments[3]);
+-                } else {
+-                    component[method]();
+-                }
+-            }
+-        }
+-    }
+-
+-    setError(error) {
+-        this.error.push(error);
+-    }
+-
+-    getError() {
+-        return this.error;
+-    }
+-
+-    getNameSpaceComponentAction(nameSpaceId, componentId, method) {
+-        let result = null;
+-
+-        if (this.nameSpaces.hasOwnProperty(nameSpaceId) && this.nameSpaces[nameSpaceId].components.hasOwnProperty(componentId)) {
+-
+-            const component = this.nameSpaces[nameSpaceId].components[componentId];
+-
+-            if (typeof component[method] === 'function') {
+-                if (arguments.length > 3) {
+-                    result = component[method](arguments[3]);
+-                } else {
+-                    result = component[method]();
+-                }
+-            }
+-        }
+-
+-        return result;
+-    }
+-}
+\ No newline at end of file
+Index: src/service/GridElement/GridElement.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/GridElement/GridElement.js b/src/service/Element/Element.js
+rename from src/service/GridElement/GridElement.js
+rename to src/service/Element/Element.js
+--- a/src/service/GridElement/GridElement.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/service/Element/Element.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,6 +1,6 @@
+ import {GridStage} from "../GridStage/GridStage";
+ 
+-export class GridElement {
++export class Element {
+     parent;
+     container;
+     eventConfig;
+Index: src/service/GridStage/GridStage.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/GridStage/GridStage.js b/src/service/GridStage/GridStage.js
+--- a/src/service/GridStage/GridStage.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/service/GridStage/GridStage.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,4 +1,4 @@
+-export class GridStage {
++export class GridStage { // TODO ist das der Service\Namespace geworden?
+     static modal = null;
+     static error = {};
+ 
+Index: src/service/Loader/Loader.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/Loader/Loader.js b/src/service/Loader/Loader.js
+new file mode 100644
+--- /dev/null	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
++++ b/src/service/Loader/Loader.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -0,0 +1,219 @@
++import {Ui} from "../Ui/GridUi";
++
++/**
++ * @property ui {Ui}
++ * @property config {Config}
++ */
++export class Loader {
++
++    constructor(config) {
++        this.config = config;
++        this.ui = this.config.service.ui;
++
++        this.namespaces = {};
++        this.loaders = {};
++        this.loadingLoaders = 0;
++        // das Nachladen von Javascripts macht eigendlich keinen Sinn dank Webpack
++        // this.startLoaders();
++        if (this.loadingLoaders === 0) {
++            this.eventAllLoadersReady();
++        }
++    }
++
++    startLoaders() {
++        const groups = [
++            'namespace',
++            'service',
++            'element',
++            'component'
++        ];
++        let $header = this.config.$container.find("header");
++        groups.map((group) => {
++            let $nodes = this.config.$container.find("[data-domgrid-" + group + "]");
++            $nodes.map(($node) => {
++                let scriptName = $node.data('domgrid-' + group);
++                if (scriptName === undefined) return;
++                let uri = this.config.getScriptUri(scriptName, group);
++                if (!this.loaders.includes(uri)) {
++                    this.loaders.push(uri);
++                    this.loadingLoaders++;
++                    let $script = $header.create('script');
++                    $script.attr("src", uri);
++                    $script.bind("load", this.eventLoaderLoaded);
++                    $script.appendTo($header);
++                }
++            });
++        })
++    }
++
++    eventLoaderLoaded() {
++        this.loadingLoaders--;
++        if (this.loadingLoaders === 0) {
++            this.eventAllLoadersReady();
++        }
++    }
++
++    eventAllLoadersReady() {
++        this.namespaces = this.initNamespaces();
++    }
++
++    initNamespaces() {
++        const $namespaces = this.config.$container.find("[data-domgrid-namespace]");
++        const namespaces = [];
++
++        if ($namespaces.length === 0) {
++            this.initNamespace(this.config.$container, 'GlobalNamespace');
++        }
++
++        $namespaces.map(($namespace) => {
++            let namespace = $namespace.data("domgrid-namespace");
++            if (namespace !== undefined) {
++                namespaces.push(this.initNamespace($namespace, namespace)); // ja, wir pushen, ggf nicht unique
++            }
++        });
++
++        return namespaces;
++    }
++
++    initNamespace($namespace, namespace) {
++        if (!this.config.namespaces.hasOwnProperty(namespace)) {
++            return this.error(['undefined namespace', namespace]);
++        }
++        let instance = new this.config.namespaces[namespace]($namespace);
++        instance.components = this.initComponents($namespace);
++        return instance;
++    }
++
++    initComponents($namespace) {
++        const $components = $namespace.find("[data-domgrid-component]");
++
++        const components = [];
++
++        $components.map(($component) => {
++            let component = $component.data("domgrid-component");
++            if (component !== undefined) {
++                components.push(this.initComponent($component, component)); // ja, wir pushen, ggf nicht unique
++            }
++        });
++
++        return components;
++    }
++
++    initComponent($component, component) {
++        if (!this.config.components.hasOwnProperty(component)) {
++            return this.error(['undefined component', component]);
++        }
++        let instance = new this.config.components[component]($component);
++        instance.elements = this.initElements($component);
++        return instance;
++    }
++
++    initElements($component) {
++        const $elements = $component.find("[data-domgrid-element]");
++
++        const elements = [];
++
++        $elements.map(($element) => {
++            let element = $element.data("domgrid-component");
++            if (element !== undefined) elements.push(this.initElement($element, element));
++        });
++
++        return elements;
++    }
++
++    initElement($element, element) {
++        if (!this.config.elements.hasOwnProperty(element)) {
++            return this.error(['undefined element', element]);
++        }
++
++        let instance = new this.config.elements[element]($element);
++        return instance;
++    }
++
++    // Das gehört hier nicht mehr hin:
++
++    postRequest(request) {
++        const xhttp = new XMLHttpRequest();
++        const _this = this;
++        xhttp.open("POST", request.url, true);
++        xhttp.send(request.formData);
++        xhttp.onreadystatechange = function () {
++            if (this.readyState == 4 && this.status == 200) {
++
++                const responseData = JSON.parse(this.responseText);
++
++                const status = (responseData.hasOwnProperty('status')) ? responseData.status : '';
++
++                if (request.hasOwnProperty('response')) {
++                    request.component[request.response](responseData);
++                }
++            }
++        };
++    }
++
++    tplRequest(request) {
++        const _this = this;
++        const xhttp = new XMLHttpRequest();
++
++        xhttp.open("GET", request.url, true);
++        xhttp.onreadystatechange = function () {
++            if (this.readyState == 4 && this.status == 200) {
++
++                const status = Ui.getJsonFromStr('status', this.responseText);
++
++                if (request.hasOwnProperty('response')) {
++                    request.component[request.response](this.responseText);
++                }
++            }
++        };
++
++        xhttp.send();
++    }
++
++    setNameSpaceComponentAction(nameSpaceId, componentId, method) {
++        if (this.namespaces.hasOwnProperty(nameSpaceId) && this.namespaces[nameSpaceId].components.hasOwnProperty(componentId)) {
++
++            const component = this.namespaces[nameSpaceId].components[componentId];
++
++            if (typeof component[method] === 'function') {
++                if (arguments.length > 3) {
++                    component[method](arguments[3]);
++                } else {
++                    component[method]();
++                }
++            }
++        }
++    }
++
++    setError(error) {
++        this.error.push(error);
++    }
++
++    getError() {
++        return this.error;
++    }
++
++    getNameSpaceComponentAction(nameSpaceId, componentId, method) {
++        let result = null;
++
++        if (this.namespaces.hasOwnProperty(nameSpaceId) && this.namespaces[nameSpaceId].components.hasOwnProperty(componentId)) {
++
++            const component = this.namespaces[nameSpaceId].components[componentId];
++
++            if (typeof component[method] === 'function') {
++                if (arguments.length > 3) {
++                    result = component[method](arguments[3]);
++                } else {
++                    result = component[method]();
++                }
++            }
++        }
++
++        return result;
++    }
++
++    error(args) {
++        console.error(args);
++        return null;
++    }
++}
+\ No newline at end of file
+Index: src/service/GridModal/GridModal.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/GridModal/GridModal.js b/src/service/Modal/Modal.js
+rename from src/service/GridModal/GridModal.js
+rename to src/service/Modal/Modal.js
+--- a/src/service/GridModal/GridModal.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/service/Modal/Modal.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,10 +1,10 @@
+ import "./gridModal.scss";
+-import {GridUi} from "../GridUi/GridUi";
++import {Ui} from "../Ui/GridUi";
+ import {GridStage} from "../GridStage/GridStage";
+ 
+ import {modalService} from "../ModalForm/ModalForm";
+ 
+-export class GridModal {
++export class Modal {
+     constructor() {
+         this.domConf = [{
+             selector: "gridModal", selectorAttr: "id", tag: "div",
+@@ -25,7 +25,7 @@
+             ]
+         }];
+ 
+-        GridUi.renderDom([...this.domConf], document.body);
++        Ui.renderDom([...this.domConf], document.body);
+ 
+         this.modal = document.getElementById('gridModal');
+         this.modalBg = document.getElementById('grid-modal-bg');
+Index: src/service/ModalForm/ModalForm.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/ModalForm/ModalForm.js b/src/service/ModalForm/ModalForm.js
+--- a/src/service/ModalForm/ModalForm.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/service/ModalForm/ModalForm.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,7 +1,7 @@
+ // TODO Diese Klasse ist noch schmutzig
+ 
+ import {GridStage} from "../GridStage/GridStage";
+-import {GridUi} from "../GridUi/GridUi";
++import {Ui} from "../Ui/GridUi";
+ 
+ modalService = {};
+ 
+@@ -37,7 +37,7 @@
+         }
+ 
+         setFormData() {
+-            const formFields = GridUi.formList(this.domModal.body);
++            const formFields = Ui.formList(this.domModal.body);
+             this.formData = [];
+ 
+             [...formFields].map((inpt) => {
+Index: src/service/Namespace/Namespace.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/Namespace/Namespace.js b/src/service/Namespace/Namespace.js
+new file mode 100644
+--- /dev/null	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
++++ b/src/service/Namespace/Namespace.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -0,0 +1,6 @@
++export class Namespace {
++    constructor($namespace) {
++        this.$container = $namespace;
++        this.components = [];
++    }
++}
+Index: src/service/Node/Node.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/Node/Node.js b/src/service/Node/Node.js
+new file mode 100644
+--- /dev/null	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
++++ b/src/service/Node/Node.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -0,0 +1,95 @@
++/**
++ * Sowas wie jQuery
++ *
++ * $document = new Node(window.document);
++ * $body = $document.find("body");
++ * $head = $document.find("head");
++ * $script = $head.create("script");
++ * $script.attr("src","something.js");
++ * $script.data("id","4711");
++ * $script.appendTo($head);
++ * cologne = $script.data("id");
++ */
++
++export class Node {
++    constructor(DOMNode) {
++    }
++
++    /**
++     * @returns {Node}
++     */
++    clone() {
++        return new Node(this);
++    }
++
++    /**
++     * @param child {string} html
++     * @returns {Node}
++     */
++    create(child) {
++        let $child = new Node(child);
++        $child.appendTo(this);
++        return $child;
++    }
++
++    /** */
++    delete() {
++
++    }
++
++    /**
++     * @param selector {string} sizzle
++     * @returns {Node[]}
++     */
++    find(selector) {
++        return new Node();
++    }
++
++    /**
++     * @param selector {string} sizzle
++     * @returns {Node}
++     */
++    closest(selector) {
++        return new Node();
++    }
++
++    /**
++     * @param node {Node}
++     * @returns {Node}
++     */
++    appendTo(node) {
++        return this;
++    }
++
++    /**
++     * @param callback {CallableFunction}
++     * @returns {Node}
++     */
++    each(callback) {
++        this.nodes.map(($node) => {
++            callback($node);
++        });
++        return this;
++    }
++
++    /**
++     * @param uri {string}
++     * @returns {Promise}
++     */
++    load(uri) {
++        return new Promise();
++    }
++
++    attr(attr, value) { // TODO WIP
++        if (value !== undefined) this.node.getAttribute(attr);
++        else this.node.setAttribute(attr, value);
++    }
++
++    data(data, value) {
++        // TODO WIP
++    }
++
++    prop(prop, value) {
++        // TODO WIP
++    }
++}
+\ No newline at end of file
+Index: src/service/GridUi/GridUi.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/service/GridUi/GridUi.js b/src/service/Ui/Ui.js
+rename from src/service/GridUi/GridUi.js
+rename to src/service/Ui/Ui.js
+--- a/src/service/GridUi/GridUi.js	(revision 09ecc97b97c309e3af105ef60f1eaabc248b37f7)
++++ b/src/service/Ui/Ui.js	(revision a5e8646895cf4db7a6e5df0624d6cec034adf28f)
+@@ -1,13 +1,16 @@
+ import "./grid-container.scss";
+ 
+-export class GridUi {
++// TODO Kann man hieraus eine Art Lib machen
++// TODO und die DOM-Manipulation und das Traversing nach {@see Node} auslagern?
++
++export class Ui {
+     static closest(selector, obj) {
+         const selectorArgs = (selector.match(/\./)) ? selector.split('.').slice(1) : [];
+         const datasetArgs = (selector.match(/^\[/)) ? selector : "";
+ 
+-        if (datasetArgs.length && GridUi.checkDataSet(obj.parentElement, datasetArgs)) {
++        if (datasetArgs.length && Ui.checkDataSet(obj.parentElement, datasetArgs)) {
+             return obj.parentElement;
+-        } else if (selectorArgs.length && GridUi.checkClassList(obj.parentElement, selectorArgs)) {
++        } else if (selectorArgs.length && Ui.checkClassList(obj.parentElement, selectorArgs)) {
+             return obj.parentElement;
+         } else if (obj.parentElement.hasAttribute("class") && obj.parentElement.classList.contains(selector)) {
+             return obj.parentElement;
+@@ -15,7 +18,7 @@
+             return obj.parentElement;
+         } else {
+             if (obj.parentElement.nodeName.toLowerCase() !== 'body') {
+-                return GridUi.closest(selector, obj.parentElement)
++                return Ui.closest(selector, obj.parentElement)
+             } else {
+                 return null;
+             }
+@@ -108,7 +111,7 @@
+ 
+             const value = obj.value.trim();
+ 
+-            if (GridUi.dataSetValue(obj, "cacheValue") && GridUi.dataSetValue(obj, "cacheValue") !== value) {
++            if (Ui.dataSetValue(obj, "cacheValue") && Ui.dataSetValue(obj, "cacheValue") !== value) {
+                 result = true;
+             }
+         });
+@@ -123,7 +126,7 @@
+ 
+             const value = obj.value.trim();
+ 
+-            if (GridUi.dataSetValue(obj, "required") && value === '') {
++            if (Ui.dataSetValue(obj, "required") && value === '') {
+                 result.push(obj.title);
+             }
+         });
+@@ -188,7 +191,7 @@
+ 
+     static updateCacheValue(list) {
+         list.map((obj) => {
+-            if (GridUi.dataSetValue(obj, "cacheValue")) {
++            if (Ui.dataSetValue(obj, "cacheValue")) {
+                 obj.dataset.cacheValue = obj.value.trim();
+             }
+         });
+@@ -196,9 +199,9 @@
+ 
+     static resetFromCacheValue(list) {
+         list.map((obj) => {
+-            const cacheValue = GridUi.dataSetValue(obj, "cacheValue");
++            const cacheValue = Ui.dataSetValue(obj, "cacheValue");
+             if (cacheValue && cacheValue !== obj.value) {
+-                obj.value = GridUi.dataSetValue(obj, "cacheValue");
++                obj.value = Ui.dataSetValue(obj, "cacheValue");
+             }
+         });
+     }
+@@ -207,7 +210,7 @@
+         const list = tbody.querySelectorAll('tr.row-formAddImport');
+         [...list].map((row) => {
+ 
+-            const containerIndex = GridUi.getIndex(tbody, 'tr.row-formAddImport', row);
++            const containerIndex = Ui.getIndex(tbody, 'tr.row-formAddImport', row);
+             const inptSequenceId = row.querySelector("input[name='sequence_id']");
+ 
+             row.querySelector('select.sequence-select').innerHTML = "";
+@@ -282,7 +285,7 @@
+             }
+ 
+             if (obj.hasOwnProperty("childNodes")) {
+-                GridUi.renderDom(obj.childNodes, element);
++                Ui.renderDom(obj.childNodes, element);
+             }
+ 
+             parent.append(element);
+@@ -292,7 +295,7 @@
+     static renderDatasetList(listDataElements, data) {
+         if (listDataElements.length) {
+             [...listDataElements].map(obj => {
+-                const key = GridUi.dataSetValue(obj, "gridEditKey");
++                const key = Ui.dataSetValue(obj, "gridEditKey");
+                 if (key && data.hasOwnProperty(key)) {
+                     if (typeof data[key] === 'object' && data[key].hasOwnProperty('length')) {
+                         data[key] = data[key].join('<br>');
+diff --git a/src/component/GridDataTable/DataTableConf.js b/src/component/DataTable/DataTableConf.js
+rename from src/component/GridDataTable/DataTableConf.js
+rename to src/component/DataTable/DataTableConf.js
+diff --git a/src/component/GridDataTable/DataTableEvent.js b/src/component/DataTable/DataTableEvent.js
+rename from src/component/GridDataTable/DataTableEvent.js
+rename to src/component/DataTable/DataTableEvent.js
+diff --git a/src/component/GridDataTable/DataTableView.js b/src/component/DataTable/DataTableView.js
+rename from src/component/GridDataTable/DataTableView.js
+rename to src/component/DataTable/DataTableView.js
+diff --git a/src/component/GridDataTable/GridDataTable.js b/src/component/DataTable/GridDataTable.js
+rename from src/component/GridDataTable/GridDataTable.js
+rename to src/component/DataTable/GridDataTable.js
+diff --git a/src/component/GridDataTable/dataTable.scss b/src/component/DataTable/dataTable.scss
+rename from src/component/GridDataTable/dataTable.scss
+rename to src/component/DataTable/dataTable.scss
+diff --git a/src/component/GridDataTable/dataTableToolBar.scss b/src/component/DataTable/dataTableToolBar.scss
+rename from src/component/GridDataTable/dataTableToolBar.scss
+rename to src/component/DataTable/dataTableToolBar.scss
+diff --git a/src/component/GridDataTableNew/DataTable.js b/src/component/DataTableNew/DataTable.js
+rename from src/component/GridDataTableNew/DataTable.js
+rename to src/component/DataTableNew/DataTable.js
+diff --git a/src/component/GridDataTableNew/DataTableConf.js b/src/component/DataTableNew/DataTableConf.js
+rename from src/component/GridDataTableNew/DataTableConf.js
+rename to src/component/DataTableNew/DataTableConf.js
+diff --git a/src/component/GridDataTableNew/DataTableHandler.js b/src/component/DataTableNew/DataTableHandler.js
+rename from src/component/GridDataTableNew/DataTableHandler.js
+rename to src/component/DataTableNew/DataTableHandler.js
+diff --git a/src/component/GridDataTableNew/DataTableSearch.js b/src/component/DataTableNew/DataTableSearch.js
+rename from src/component/GridDataTableNew/DataTableSearch.js
+rename to src/component/DataTableNew/DataTableSearch.js
+diff --git a/src/component/GridDataTableNew/DataTableUtile.js b/src/component/DataTableNew/DataTableUtile.js
+rename from src/component/GridDataTableNew/DataTableUtile.js
+rename to src/component/DataTableNew/DataTableUtile.js
+diff --git a/src/component/GridDataTableNew/order-box-container.scss b/src/component/DataTableNew/order-box-container.scss
+rename from src/component/GridDataTableNew/order-box-container.scss
+rename to src/component/DataTableNew/order-box-container.scss
+diff --git a/src/component/GridDatePicker/date-picker.scss b/src/component/DatePicker/date-picker.scss
+rename from src/component/GridDatePicker/date-picker.scss
+rename to src/component/DatePicker/date-picker.scss
+diff --git a/src/component/GridSideNavi/grid-sidenavi.scss b/src/component/SideNavi/grid-sidenavi.scss
+rename from src/component/GridSideNavi/grid-sidenavi.scss
+rename to src/component/SideNavi/grid-sidenavi.scss
+diff --git a/src/service/GridModal/gridModal.scss b/src/service/Modal/gridModal.scss
+rename from src/service/GridModal/gridModal.scss
+rename to src/service/Modal/gridModal.scss
+diff --git a/src/service/GridUi/grid-container.scss b/src/service/Ui/grid-container.scss
+rename from src/service/GridUi/grid-container.scss
+rename to src/service/Ui/grid-container.scss
