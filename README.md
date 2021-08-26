@@ -51,4 +51,4 @@ Core element class extend by element
 Small Sample of helper functions
 
 ### Demoversion
-https://netcodev.de/domgrid/
+https://domgrid.netcodev.de
