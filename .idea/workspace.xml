@@ -1,28 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="eab91037-14b6-4456-b1ec-31296b569b71" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/DomGrid.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/GridComponent.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/GridElement.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/GridModal.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/GridUi.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/component/GridDataTable.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/component/GridDataTableNew.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/component/GridDatePicker.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/component/GridEdit.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/component/GridExampleModal.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/component/GridForm.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/component/GridFormList.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/component/GridSelectContent.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/component/GridSideNavi.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/element/GridLinkElement.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/element/GridModalTplElement.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/element/GridRowElement.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/service/ModalForm.service.js" beforeDir="false" />
-    </list>
+    <list default="true" id="eab91037-14b6-4456-b1ec-31296b569b71" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -45,7 +24,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="settings.editor.selected.configurable" value="application.passwordSafe" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />

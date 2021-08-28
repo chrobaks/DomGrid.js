@@ -1,4 +1,4 @@
-import {DomGrid} from "./service/DomGrid";
+import {DomGrid} from "./service/DomGrid/DomGrid";
 import {config} from "../config/test";
 
 new DomGrid(config); // geil oder? :D

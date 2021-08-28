@@ -1,0 +1,17 @@
+// hier bitte nur ein paar Konstanten,
+// die es erlauben es etwas zu personalisieren
+
+$color-border: #cccccc;
+$color-text: #333333;
+$color-headlines: #666666;
+
+$border: 1px solid $color-border;
+
+$font-headlines: Verdana, Tahoma, sans-serif;
+$font-text: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+$font-misc: 'Times New Roman', serif;
+$font-pre: 'Lucida Console', monospace;
+
+// Alle Componenten sollten selbst keinen konkreten Angaben
+// zu Fonts, Farben Rahmen und Abständen mehr enthalten
+// sondern sich ausschließlich auf diese Konstanten beziehen.

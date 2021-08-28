@@ -57,7 +57,7 @@ export class DataTableView {
 
             }
             if (css === 'data-col') {
-                col.setAttribute('data-col-index', colIndex);
+                col.setAttribute('data-col-index', colIndex + "");
                 if (this.config.arrToggleList.indexOf(colIndex + "") !== -1) {
                     col.style.display = "none";
                 }

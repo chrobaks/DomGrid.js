@@ -1,34 +1,37 @@
+@import "../../../config/theme";
+
 .dataTable {
   width: 100%;
   overflow: hidden;
-  border: 1px solid #ccc;
+  border: $border;
+  font-family: $font-text;
 }
 
 // TODO Bitte zerlegen!
 
 .dataTable-toolbar, .dataTable-header-toolbar, .dataTable-content-toolbar, .col-header {
-  font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-family: $font-text;
 }
 
 .col-search {
-  font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-family: $font-text;
 
   button {
-    font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-family: $font-text;
   }
 }
 
 .dataTable-table {
   th.th-sticky {
-    font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-family: $font-text;
   }
 
   td {
     &.td-sticky {
-      font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+      font-family: $font-text;
     }
 
-    font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-family: $font-text;
   }
 }
 
@@ -39,7 +42,7 @@
   width: 100%;
   height: 27px;
   background-color: #666;
-  border-bottom: 1px solid #666;
+  border-bottom: $border;
   z-index: 2;
 }
 

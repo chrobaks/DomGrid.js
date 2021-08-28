@@ -1,4 +1,5 @@
 import "./dataTableToolBar.scss";
+import {DataTableUtile} from "../GridDataTableNew/DataTableUtile";
 
 export class DataTableToolBar {
     constructor(DataTable) {

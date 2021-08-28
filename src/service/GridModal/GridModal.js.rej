@@ -1,0 +1,13 @@
+diff a/src/service/GridModal/GridModal.js b/src/service/GridModal/GridModal.js	(rejected hunks)
+@@ -1,4 +1,10 @@
+-export class gridModal {
++import "./gridModal.scss";
++import {GridUi} from "../GridUi/GridUi";
++import {GridStage} from "../GridStage/GridStage";
++
++import {modalService} from "../ModalForm/ModalForm";
++
++export class GridModal {
+     constructor() {
+         this.domConf = [{
+             selector: "gridModal", selectorAttr: "id", tag: "div",

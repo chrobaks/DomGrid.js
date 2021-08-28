@@ -1,3 +1,4 @@
 export const config = {
-    'test': true
+    'test': true,
+    'containerId' : '#container'
 }

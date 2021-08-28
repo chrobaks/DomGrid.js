@@ -1,6 +1,4 @@
-import {DataTableUtile} from "../GridDataTableNew/DataTableUtile";
-
-export class DataTableUtils {
+export class DataTableUtile {
     static getStrNumber(i, str) {
         let res = "";
         let nextChar = null;

@@ -1,0 +1,20 @@
+diff a/src/service/DomGrid/DomGrid.js b/src/service/DomGrid/DomGrid.js	(rejected hunks)
+@@ -1,12 +1,16 @@
+-import "../../style/index.scss"; // TODO auflösen!
++import {GridModal} from "../GridModal/GridModal";
++import {GridUi} from "../GridUi/GridUi";
++import {GridStage} from "../GridStage/GridStage";
+ 
+ export class DomGrid {
++    scriptPath; // TODO
++
+     constructor(config) {
+         this.config = config;
+         this.container = document.getElementById(config.containerId);
+         this.nameSpaces = [];
+         this.components = [];
+-        this.modal = new gridModal();
++        this.modal = new GridModal();
+         this.registeredScripts = [];
+         this.error = [];
+ 

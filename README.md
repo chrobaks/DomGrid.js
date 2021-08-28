@@ -6,7 +6,7 @@ yarn build
 yarn serve
 ```
 
-### Singlepage Javascript framework
+## Singlepage Javascript framework
 
 Small Javascript object settings for personalized Web-Applications.
 
@@ -21,10 +21,15 @@ DomGrid is NOT like angular or react, you have to write much more code, if you s
 
 You can build your own version cycle up to the requirements of your Application, not of the Framework you are using.
 
+## Customization
+
+look into config folder.
+
 ### Structure
 
 - config
   - test.js
+  - theme.scss
 - src
   - component
     - ComponentName
@@ -42,7 +47,8 @@ You can build your own version cycle up to the requirements of your Application,
 - index.html
 - webpack.config.js
 - 
-### Documentation 
+
+## Documentation 
 
 #### DomGrid.js 
 - Instantiate GridModal

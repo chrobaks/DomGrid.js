@@ -1,4 +1,4 @@
-import {DataTableUtile} from "../GridDataTableNew/DataTableUtile";
+import {DataTableUtile} from "./DataTableUtile";
 
 export class DataTableSearch {
     constructor() {

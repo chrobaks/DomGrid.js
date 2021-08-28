@@ -1,0 +1,65 @@
+@import "../../../config/theme";
+
+#gridModal {
+  display: none;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  font-family: $font-text;
+}
+
+#grid-modal-bg {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 600px;
+  background-color: rgba(255, 255, 255, 0.5);
+  z-index: 1;
+}
+
+#grid-modal-container {
+  display: block;
+  position: absolute;
+  width: 600px !important;
+  top: 200px;
+  left: 50%;
+  margin-left: -300px;
+  border: $border;
+  z-index: 2;
+  background-color: #e5e5e5;
+
+  &.w800 {
+    width: 800px !important;
+    margin-left: -400px !important;
+  }
+}
+
+#gridModal {
+  .grid-modal-head, .grid-modal-footer {
+    width: 100%;
+    background-color: #333;
+    color: #e5e5e5;
+  }
+
+  .grid-modal-head .title {
+    line-height: 2em;
+    padding-left: 10px;
+    font-weight: bold;
+  }
+
+  .grid-modal-footer {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .grid-modal-body {
+    padding: 30px 0;
+    background-color: #e5e5e5;
+    overflow-y: auto;
+
+    .modal-body-container {
+      padding: 10px;
+    }
+  }
+}

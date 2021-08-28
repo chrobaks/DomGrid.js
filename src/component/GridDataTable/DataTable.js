@@ -1,9 +1,15 @@
-import "./dataTable.scss"; // jede Komponente sollte ihr eigenes CSS mitbringen!
+import "./dataTable.scss";
+import {DataTableSearch} from "./DataTableSearch";
+import {DataTableEvent} from "./DataTableEvent";
+import {DataTableView} from "./DataTableView";
+import {DataTableToolBar} from "./DataTableToolBar";
+import {DataTableConf} from "./DataTableConf";
+import {GridUi} from "../../service/GridUi/GridUi";
 
 export class DataTable {
     constructor(container, config) {
         // Set config
-        this.config = DataTableConf.getConf(config);
+        this.config = DataTableConf; // TODO was ist mit config?
         this.config.dom.container = container;
         // Init components
         this.Search = new DataTableSearch();
