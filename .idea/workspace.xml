@@ -1,7 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="eab91037-14b6-4456-b1ec-31296b569b71" name="Changes" comment="" />
+    <list default="true" id="eab91037-14b6-4456-b1ec-31296b569b71" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/config/test.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTable/DataTable.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTable/DataTableComponent.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTable/DataTableConf.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTable/DataTableEvent.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTable/DataTableSearch.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTable/DataTableToolBar.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTable/DataTableUtils.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTable/DataTableView.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTable/GridDataTable.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTable/dataTable.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTable/dataTableToolBar.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTableNew/DataTable.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTableNew/DataTableConf.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTableNew/DataTableHandler.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTableNew/DataTableSearch.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTableNew/DataTableUtile.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTableNew/GridDataTableNew.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDataTableNew/order-box-container.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDatePicker/GridDatePicker.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridDatePicker/date-picker.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridEdit/GridEdit.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridExampleModal/GridExampleModal.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridForm/GridForm.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridFormList/GridFormList.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridSelectContent/GridSelectContent.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridSideNavi/GridSideNavi.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/GridSideNavi/grid-sidenavi.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/element/GridLinkElement/GridLinkElement.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/element/GridModalTplElement/GridModalTplElement.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/element/GridRowElement/GridRowElement.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/GridComponent/GridComponent.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/GridElement/GridElement.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/GridModal/GridModal.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/GridModal/gridModal.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/GridStage/GridStage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/GridStage/GridStage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/GridUi/GridUi.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/GridUi/grid-container.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/ModalForm/ModalForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/ModalForm/ModalForm.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
