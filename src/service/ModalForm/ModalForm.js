@@ -1,7 +1,7 @@
 // TODO Diese Klasse ist noch schmutzig
 
 import {GridStage} from "../GridStage/GridStage";
-import {GridUi} from "../GridUi/GridUi";
+import {Ui} from "../Ui/GridUi";
 
 modalService = {};
 
@@ -37,7 +37,7 @@ if (typeof ServiceModalForm === 'undefined') {
         }
 
         setFormData() {
-            const formFields = GridUi.formList(this.domModal.body);
+            const formFields = Ui.formList(this.domModal.body);
             this.formData = [];
 
             [...formFields].map((inpt) => {

@@ -1,0 +1,27 @@
+diff a/src/service/Component/Component.js b/src/service/Component/Component.js	(rejected hunks)
+@@ -1,7 +1,7 @@
+-import {GridUi} from "../GridUi/GridUi";
++import {Ui} from "../Ui/GridUi";
+ import {GridStage} from "../GridStage/GridStage";
+ 
+-export class GridComponent {
++export class Component {
+     nameSpace;
+     componentId;
+     container;
+@@ -12,12 +12,13 @@
+ 
+     constructor(container, nameSpace) {
+         this.nameSpace = nameSpace;
+-        this.componentId = container.dataset.gridComponent;
++        this.componentId = container.dataset.Component;
+         this.container = container;
+         this.eventConfig = [];
+         this.state = {};
++        this.elements = [];
+         this.stateOk = true;
+-        this.containerUrl = GridUi.dataSetValue(this.container, 'containerUrl');
++        this.containerUrl = Ui.dataSetValue(this.container, 'containerUrl');
+     }
+ 
+     setEvents() {

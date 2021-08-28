@@ -1,4 +1,4 @@
-export class GridStage {
+export class GridStage { // TODO ist das der Service\Namespace geworden?
     static modal = null;
     static error = {};
 

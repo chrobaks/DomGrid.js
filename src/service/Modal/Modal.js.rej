@@ -1,0 +1,23 @@
+diff a/src/service/Modal/Modal.js b/src/service/Modal/Modal.js	(rejected hunks)
+@@ -1,10 +1,10 @@
+ import "./gridModal.scss";
+-import {GridUi} from "../GridUi/GridUi";
++import {Ui} from "../Ui/GridUi";
+ import {GridStage} from "../GridStage/GridStage";
+ 
+ import {modalService} from "../ModalForm/ModalForm";
+ 
+-export class GridModal {
++export class Modal {
+     constructor() {
+         this.domConf = [{
+             selector: "gridModal", selectorAttr: "id", tag: "div",
+@@ -25,7 +25,7 @@
+             ]
+         }];
+ 
+-        GridUi.renderDom([...this.domConf], document.body);
++        Ui.renderDom([...this.domConf], document.body);
+ 
+         this.modal = document.getElementById('gridModal');
+         this.modalBg = document.getElementById('grid-modal-bg');
