@@ -1,13 +1,11 @@
-class GridUi
-{
-    static closest (selector, obj)
-    {
+export class GridUi {
+    static closest(selector, obj) {
         const selectorArgs = (selector.match(/\./)) ? selector.split('.').slice(1) : [];
         const datasetArgs = (selector.match(/^\[/)) ? selector : "";
 
-        if (datasetArgs.length && GridUi.checkDataSet(obj.parentElement,datasetArgs)) {
+        if (datasetArgs.length && GridUi.checkDataSet(obj.parentElement, datasetArgs)) {
             return obj.parentElement;
-        } else if (selectorArgs.length && GridUi.checkClassList(obj.parentElement,selectorArgs)) {
+        } else if (selectorArgs.length && GridUi.checkClassList(obj.parentElement, selectorArgs)) {
             return obj.parentElement;
         } else if (obj.parentElement.hasAttribute("class") && obj.parentElement.classList.contains(selector)) {
             return obj.parentElement;
@@ -22,13 +20,11 @@ class GridUi
         }
     }
 
-    static requestStatus (res)
-    {
+    static requestStatus(res) {
         return !!(res.hasOwnProperty('status') && res.status === 'success');
     }
 
-    static checkDataSet (obj, datasetArgs)
-    {
+    static checkDataSet(obj, datasetArgs) {
         let result = false;
         let keyArgs = "";
         let key = "";
@@ -50,10 +46,12 @@ class GridUi
         keyArgs = keyArgs.split("-");
         key = keyArgs[0];
 
-        for(let i = 1; i < keyArgs.length; i++) { key += keyArgs[i].charAt(0).toUpperCase() + keyArgs[i].slice(1)}
-        
+        for (let i = 1; i < keyArgs.length; i++) {
+            key += keyArgs[i].charAt(0).toUpperCase() + keyArgs[i].slice(1)
+        }
+
         if (obj.dataset.hasOwnProperty(key)) {
-            
+
             result = true;
 
             if (value && this.dataSetValue(obj, key) !== value) {
@@ -64,31 +62,28 @@ class GridUi
         return result;
     }
 
-    static checkDate (arrDate)
-    {
+    static checkDate(arrDate) {
         let result = false;
 
         if (arrDate.length && arrDate.length === 3) {
-            
-            const check = new Date(arrDate[0]+"-"+arrDate[1]+"-"+arrDate[2]);
+
+            const check = new Date(arrDate[0] + "-" + arrDate[1] + "-" + arrDate[2]);
             result = (check.toString() !== "Invalid Date");
         }
-        
+
         return result;
     }
 
-    static checkDateRange (from, to)
-    {
+    static checkDateRange(from, to) {
         const startArg = from.split('.');
         const endArg = to.split('.');
-        const startDate = new Date(startArg[1]+"/"+startArg[0]+"/"+startArg[2]).getTime();
-        const endDate = new Date(endArg[1]+"/"+endArg[0]+"/"+endArg[2]).getTime();
-        
+        const startDate = new Date(startArg[1] + "/" + startArg[0] + "/" + startArg[2]).getTime();
+        const endDate = new Date(endArg[1] + "/" + endArg[0] + "/" + endArg[2]).getTime();
+
         return (startArg <= endArg);
     }
 
-    static checkClassList (obj, listClass)
-    {
+    static checkClassList(obj, listClass) {
         const getClassName = (arguments.length > 2) ? arguments[2] : 0;
         let result = (getClassName) ? '' : true;
 
@@ -107,22 +102,22 @@ class GridUi
         }
     }
 
-    static checkDataChanged (list)
-    {
+    static checkDataChanged(list) {
         let result = false;
 
         list.map((obj) => {
 
             const value = obj.value.trim();
 
-            if (GridUi.dataSetValue(obj, "cacheValue") && GridUi.dataSetValue(obj, "cacheValue") !== value) { result = true; }
+            if (GridUi.dataSetValue(obj, "cacheValue") && GridUi.dataSetValue(obj, "cacheValue") !== value) {
+                result = true;
+            }
         });
 
         return result;
     }
 
-    static checkFormValidation (list)
-    {
+    static checkFormValidation(list) {
         const result = [];
 
         list.map((obj) => {
@@ -155,8 +150,7 @@ class GridUi
         ];
     }
 
-    static formListToData (formList)
-    {
+    static formListToData(formList) {
         const formData = new FormData();
         const emptyKeys = [];
 
@@ -164,18 +158,17 @@ class GridUi
             formList.map((elmn) => {
 
                 formData.append(elmn.name, elmn.value.trim());
-                
+
                 if (elmn.value === "") {
                     emptyKeys.push(elmn.name);
                 }
             });
         }
 
-        return {formData : formData, emptyKeys : emptyKeys};
+        return {formData: formData, emptyKeys: emptyKeys};
     }
 
-    static formData (arrArgs)
-    {
+    static formData(arrArgs) {
         const formData = new FormData();
 
         for (let e in arrArgs) {
@@ -184,20 +177,19 @@ class GridUi
 
         return formData;
     }
-    
-    static formFileData (id, appType, arrArgs)
-    {
+
+    static formFileData(id, appType, arrArgs) {
         const formData = new FormData();
-        
+
         for (let i = 0; i < arrArgs.length; i++) {
-            
+
             const file = arrArgs[i];
-            
+
             // Check file type is allowed in appType
             if (!appType.includes(file.type)) {
                 continue;
             }
-        
+
             // Add file data
             formData.append(id, file, file.name);
         }
@@ -205,25 +197,24 @@ class GridUi
         return formData;
     }
 
-    static updateCacheValue (list)
-    {
+    static updateCacheValue(list) {
         list.map((obj) => {
-            if (GridUi.dataSetValue(obj, "cacheValue")) { obj.dataset.cacheValue = obj.value.trim(); }
+            if (GridUi.dataSetValue(obj, "cacheValue")) {
+                obj.dataset.cacheValue = obj.value.trim();
+            }
         });
     }
 
-    static resetFromCacheValue (list)
-    {
+    static resetFromCacheValue(list) {
         list.map((obj) => {
             const cacheValue = GridUi.dataSetValue(obj, "cacheValue");
-            if (cacheValue && cacheValue !== obj.value) { 
+            if (cacheValue && cacheValue !== obj.value) {
                 obj.value = GridUi.dataSetValue(obj, "cacheValue");
             }
         });
     }
 
-    static updateSelectSequence (tbody)
-    {
+    static updateSelectSequence(tbody) {
         const list = tbody.querySelectorAll('tr.row-formAddImport');
         [...list].map((row) => {
 
@@ -232,7 +223,9 @@ class GridUi
 
             row.querySelector('select.sequence-select').innerHTML = "";
 
-            if (inptSequenceId) { inptSequenceId.value = containerIndex + 1; }
+            if (inptSequenceId) {
+                inptSequenceId.value = containerIndex + 1;
+            }
 
             for (let i = 1; i <= list.length; i++) {
                 const option = document.createElement("option");
@@ -244,28 +237,26 @@ class GridUi
         });
     }
 
-    static dataSetValue (obj, key)
-    {
+    static dataSetValue(obj, key) {
         return (obj.dataset.hasOwnProperty(key)) ? obj.dataset[key] : '';
     }
 
-    static getIndex (container, selector, obj)
-    {
-        const list = Array.prototype.slice.call( container.querySelectorAll(selector) );
+    static getIndex(container, selector, obj) {
+        const list = Array.prototype.slice.call(container.querySelectorAll(selector));
 
         return list.indexOf(obj);
     }
 
-    static getJsonFromStr (key, str)
-    {
+    static getJsonFromStr(key, str) {
         let result = null;
 
         try {
             const jsonObj = JSON.parse(str);
 
-            if (typeof jsonObj === 'object' && jsonObj.hasOwnProperty(key)) {result = jsonObj.key;}
-        }
-        catch(err) {
+            if (typeof jsonObj === 'object' && jsonObj.hasOwnProperty(key)) {
+                result = jsonObj.key;
+            }
+        } catch (err) {
             if (err && err.message.length) {
                 result = null;
             }
@@ -274,8 +265,7 @@ class GridUi
         return result;
     }
 
-    static listHasUniqueValue (list, value, limit)
-    {
+    static listHasUniqueValue(list, value, limit) {
         let count = 0;
 
         list.map(obj => {
@@ -287,8 +277,7 @@ class GridUi
         return (count <= limit);
     }
 
-    static renderDom (conf, parent)
-    {
+    static renderDom(conf, parent) {
         conf.map((obj) => {
 
             const element = document.createElement(obj.tag);
@@ -311,11 +300,10 @@ class GridUi
         });
     }
 
-    static renderDatasetList (listDataElements, data)
-    {
+    static renderDatasetList(listDataElements, data) {
         if (listDataElements.length) {
             [...listDataElements].map(obj => {
-                const key = GridUi.dataSetValue(obj,"gridEditKey");
+                const key = GridUi.dataSetValue(obj, "gridEditKey");
                 if (key && data.hasOwnProperty(key)) {
                     if (typeof data[key] === 'object' && data[key].hasOwnProperty('length')) {
                         data[key] = data[key].join('<br>');

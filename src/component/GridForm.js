@@ -1,17 +1,17 @@
-class GridForm extends GridComponent
-{
-    constructor (obj, nameSpace) 
-    { 
-        super(obj, nameSpace); 
+import {GridComponent} from "../service/GridComponent";
+
+export class GridForm extends GridComponent {
+    constructor(obj, nameSpace) {
+        super(obj, nameSpace);
 
         this.eventConfig = [
-            {selector : "button.btn-primary", action : "onclick", callBack : "setRequest"},
-            {selector : ".datepicker", action : "onmouseover", callBack : "setDatepicker"},
+            {selector: "button.btn-primary", action: "onclick", callBack: "setRequest"},
+            {selector: ".datepicker", action: "onmouseover", callBack: "setDatepicker"},
         ];
 
         this.setState([
-            {id : 'dateFrom', elmn : this.container.querySelectorAll('input.datepicker')[0]},
-            {id : 'dateTo', elmn : this.container.querySelectorAll('input.datepicker')[1]}
+            {id: 'dateFrom', elmn: this.container.querySelectorAll('input.datepicker')[0]},
+            {id: 'dateTo', elmn: this.container.querySelectorAll('input.datepicker')[1]}
         ]);
 
         this.setEvents();
@@ -19,14 +19,13 @@ class GridForm extends GridComponent
         console.log('component load');
     }
 
-    setRequest (obj)
-    {
+    setRequest(obj) {
         // Set formList
         const formList = [...this.container.querySelectorAll("input"), ...this.container.querySelectorAll("select"), ...this.container.querySelectorAll("textarea")];
 
         // Get form validation
         const error = GridUi.checkFormValidation(formList);
-        console.log("error",error);
+        console.log("error", error);
         // If empty required fields exists
         if (error.length) {
             alert("Folgende Felder benötigen einen Eintrag: " + error.join(", "));
@@ -48,8 +47,8 @@ class GridForm extends GridComponent
             // this.setComponentRequest("postRequest", {url : GridUi.dataSetValue(obj, "requestUrl"), formData : formResults.formData, response : "setResponse"});
         }
     }
-    setDatepicker (obj)
-    {
+
+    setDatepicker(obj) {
         GridDatePicker.createInstance(this.nameSpace, obj);
     }
 } 

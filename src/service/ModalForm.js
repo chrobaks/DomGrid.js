@@ -1,29 +1,27 @@
+// TODO Diese Klasse ist noch schmutzig
+
 modalService = {};
 
 if (typeof ServiceModalForm === 'undefined') {
 
-    class ServiceModalForm
-    {
-        constructor() 
-        {
+    class ServiceModalForm {
+        constructor() {
             this.config = {};
             this.domModal = {};
             this.formData = [];
             this.error = [];
         }
 
-        setConfig (conf, domModal)
-        {
+        setConfig(conf, domModal) {
             this.config = conf;
             this.domModal = domModal;
         }
 
-        setView () {
+        setView() {
             this.domModal.body.querySelectorAll('input')[0].focus();
         }
 
-        setViewClose ()
-        {
+        setViewClose() {
             this.setFormData();
 
             if (this.error.length) {
@@ -35,8 +33,7 @@ if (typeof ServiceModalForm === 'undefined') {
             }
         }
 
-        setFormData ()
-        {
+        setFormData() {
             const formFields = GridUi.formList(this.domModal.body);
             this.formData = [];
 
@@ -53,8 +50,10 @@ if (typeof ServiceModalForm === 'undefined') {
             }
         }
     }
-    
+
     // Init modal service instance
     modalService = new ServiceModalForm();
 
 }
+modalForm = modalService
+export var modalForm;

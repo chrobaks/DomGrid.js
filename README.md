@@ -1,4 +1,11 @@
 # DomGrid.js
+
+```sh
+yarn
+yarn build
+yarn serve
+```
+
 ### Singlepage Javascript framework
 
 Small Javascript object settings for personalized Web-Applications.
@@ -8,27 +15,33 @@ Small Javascript object settings for personalized Web-Applications.
 - Experience in Javascript (min. 1 year)
 - Experience in OOP (Javascript, min. 1 year)
 
-
 ### Where to use
+
 DomGrid is NOT like angular or react, you have to write much more code, if you start with.
 
 You can build your own version cycle up to the requirements of your Application, not of the Framework you are using.
 
 ### Structure
 
-- js
-- - DomGrid.js
-- - GridModal.js
-- - GridComponent.js
-- - GridElement.js
-- - GridUi.js
-- - component/
-- - element/
-- - service/
-
-- css
-- - domgrid.css
-
+- config
+  - test.js
+- src
+  - component
+    - ComponentName
+      - ComponentName.js
+      - ComponentName.scss (optional)
+  - element
+      - ElementName
+          - ElementName.js
+          - ElementName.scss (optional)
+  - service
+      - ServiceName
+          - ServiceName.js
+          - ServiceName.scss (optional)
+  - index.js // entrypoint of the app 
+- index.html
+- webpack.config.js
+- 
 ### Documentation 
 
 #### DomGrid.js 

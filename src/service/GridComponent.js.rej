@@ -1,0 +1,165 @@
+diff a/src/service/GridComponent.js b/src/service/GridComponent.js	(rejected hunks)
+@@ -1,5 +1,4 @@
+-class GridComponent
+-{
++export class GridComponent {
+     nameSpace;
+     componentId;
+     container;
+@@ -8,26 +7,25 @@
+     stateOk;
+     containerUrl;
+ 
+-    constructor (container, nameSpace)
+-    {
++    constructor(container, nameSpace) {
+         this.nameSpace = nameSpace;
+         this.componentId = container.dataset.gridComponent;
+         this.container = container;
+         this.eventConfig = [];
+         this.state = {};
+         this.stateOk = true;
+-        this.containerUrl = GridUi.dataSetValue(this.container,'containerUrl');
++        this.containerUrl = GridUi.dataSetValue(this.container, 'containerUrl');
+     }
+ 
+-    setEvents ()
+-    {
+-        const _this =  this;
++    setEvents() {
++        const _this = this;
+         const eventList = (!arguments.length) ? [...this.eventConfig] : [...arguments[0]];
+-        
+-        if (!this.stateOk || eventList.length < 1) {return false;}
++
++        if (!this.stateOk || eventList.length < 1) {
++            return false;
++        }
+ 
+-        eventList.map((conf) => 
+-        {
++        eventList.map((conf) => {
+             const list = this.container.querySelectorAll(conf.selector);
+ 
+             if (list && list.length) {
+@@ -35,8 +33,8 @@
+                     obj[conf.action] = () => {
+ 
+                         const event = (conf.hasOwnProperty('callBack')) ? conf.callBack : null;
+-                        
+-                        if (typeof this[event] !== 'undefined') { 
++
++                        if (typeof this[event] !== 'undefined') {
+                             if (conf.hasOwnProperty('callParam')) {
+                                 this[event](obj, conf.callParam);
+                             } else {
+@@ -49,44 +47,45 @@
+         });
+     }
+ 
+-    setState (objState)
+-    {
++    setState(objState) {
+         objState.map((obj) => {
+             if (typeof obj.elmn !== 'undefined') {
+                 this.state[obj.id] = obj.elmn;
+             } else {
+-                if(this.stateOk) {this.stateOk = false;}
++                if (this.stateOk) {
++                    this.stateOk = false;
++                }
+             }
+         });
+     }
+ 
+-    setStateValue (key,val)
+-    {
+-        if (this.state.hasOwnProperty(key)) {this.state[key].value = val;}
++    setStateValue(key, val) {
++        if (this.state.hasOwnProperty(key)) {
++            this.state[key].value = val;
++        }
+     }
+ 
+-    setStateDataSetValue (key, dsKey, val)
+-    {
+-        if (this.state.hasOwnProperty(key) && this.state[key].dataset && this.state[key].dataset.hasOwnProperty(dsKey)) { this.state[key].dataset[dsKey] = val; }
++    setStateDataSetValue(key, dsKey, val) {
++        if (this.state.hasOwnProperty(key) && this.state[key].dataset && this.state[key].dataset.hasOwnProperty(dsKey)) {
++            this.state[key].dataset[dsKey] = val;
++        }
+     }
+ 
+-    setMessage (msg)
+-    {
++    setMessage(msg) {
+         const componentMsg = this.container.querySelector(".component-msg");
+         let strMsg = '';
+ 
+-        if (componentMsg) { 
++        if (componentMsg) {
+             if (typeof msg === 'object' && msg.hasOwnProperty('status')) {
+-                strMsg = (msg.status === 'success') ? msg.msg : ((msg.hasOwnProperty('errorMsg')) ? msg.msg+"<br>"+msg.errorMsg : msg.msg);
++                strMsg = (msg.status === 'success') ? msg.msg : ((msg.hasOwnProperty('errorMsg')) ? msg.msg + "<br>" + msg.errorMsg : msg.msg);
+             } else {
+                 strMsg = msg;
+             }
+-            componentMsg.innerHTML = strMsg; 
++            componentMsg.innerHTML = strMsg;
+         }
+     }
+ 
+-    setComponentAction (conf)
+-    {
++    setComponentAction(conf) {
+         const multipleAct = (arguments.length > 1) ? arguments[1] : false;
+ 
+         if (!multipleAct) {
+@@ -98,39 +97,33 @@
+         }
+     }
+ 
+-    setComponentRequest (requestAct, request)
+-    {
++    setComponentRequest(requestAct, request) {
+         request.component = this;
+ 
+         GridStage[requestAct](request);
+     }
+ 
+-    getState (key)
+-    {
++    getState(key) {
+         return (this.state.hasOwnProperty(key)) ? this.state[key] : null;
+     }
+ 
+-    getStateDataSet (key, dsKey)
+-    {
++    getStateDataSet(key, dsKey) {
+         return (this.state.hasOwnProperty(key) && this.state[key].dataset && this.state[key].dataset.hasOwnProperty(dsKey)) ? this.state[key].dataset[dsKey] : null;
+     }
+ 
+-    getComponentAction (conf)
+-    {
++    getComponentAction(conf) {
+         return GridStage.getNameSpaceComponentAction(this.nameSpace, ...conf);
+     }
+ 
+-    createElementInstance (elementId, param)
+-    {
++    createElementInstance(elementId, param) {
+         if (typeof eval(elementId) !== 'udefined') {
+             const element = eval(elementId);
+-            
++
+             element.createInstance(this, ...param);
+         }
+     }
+ 
+-    renderBody (html)
+-    {
++    renderBody(html) {
+         this.container.querySelector('tbody').innerHTML = html;
+     }
+ }
+\ No newline at end of file

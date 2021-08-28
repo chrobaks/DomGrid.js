@@ -1,0 +1,133 @@
+diff a/src/service/GridModal.js b/src/service/GridModal.js	(rejected hunks)
+@@ -1,19 +1,21 @@
+-class gridModal
+-{
+-    constructor ()
+-    {
++export class gridModal {
++    constructor() {
+         this.domConf = [{
+-            selector : "gridModal", selectorAttr : "id", tag: "div",
+-            childNodes : [
+-                {selector : "grid-modal-bg", selectorAttr : "id", tag: "div"},
+-                {selector : "grid-modal-container", selectorAttr : "id", tag: "div", childNodes : [
+-                        {selector : ["grid-modal-head"], selectorAttr : "class", tag: "div", childNodes : [{selector : ["title"], selectorAttr : "class", tag: "span"}]},
+-                        {selector : ["grid-modal-body"], selectorAttr : "class", tag: "div"},
+-                        {selector : ["grid-modal-footer"], selectorAttr : "class", tag: "div", childNodes : [
+-                                {selector : ["btn","btn-primary", "save"], selectorAttr : "class", tag: "button", textNode : "Daten speichern"},
+-                                {selector : ["btn","btn-primary", "close"], selectorAttr : "class", tag: "button", textNode : "Fenster schliessen"},
+-                            ]},
+-                    ]},
++            selector: "gridModal", selectorAttr: "id", tag: "div",
++            childNodes: [
++                {selector: "grid-modal-bg", selectorAttr: "id", tag: "div"},
++                {
++                    selector: "grid-modal-container", selectorAttr: "id", tag: "div", childNodes: [
++                        {selector: ["grid-modal-head"], selectorAttr: "class", tag: "div", childNodes: [{selector: ["title"], selectorAttr: "class", tag: "span"}]},
++                        {selector: ["grid-modal-body"], selectorAttr: "class", tag: "div"},
++                        {
++                            selector: ["grid-modal-footer"], selectorAttr: "class", tag: "div", childNodes: [
++                                {selector: ["btn", "btn-primary", "save"], selectorAttr: "class", tag: "button", textNode: "Daten speichern"},
++                                {selector: ["btn", "btn-primary", "close"], selectorAttr: "class", tag: "button", textNode: "Fenster schliessen"},
++                            ]
++                        },
++                    ]
++                },
+             ]
+         }];
+ 
+@@ -29,8 +31,7 @@
+         this.modalEvent();
+     }
+ 
+-    modalDisplay ()
+-    {
++    modalDisplay() {
+         this.modal.style.display = (this.modal.style.display === 'inline-block') ? 'none' : 'inline-block';
+ 
+         if (this.modal.style.display === 'inline-block') {
+@@ -45,29 +46,32 @@
+         }
+     }
+ 
+-    modalEvent ()
+-    {
++    modalEvent() {
+         this.modal.querySelector('button.save').onclick = () => {
+-            if(typeof modalService !== 'undefined' && typeof modalService.setViewClose === 'function') {
++            if (typeof modalService !== 'undefined' && typeof modalService.setViewClose === 'function') {
+                 modalService.setViewClose();
+             }
+         }
+-        this.modal.querySelector('button.close').onclick = () => { this.modalDisplay(); }
+-        this.modalBg.onclick = () => { this.modalDisplay(); }
++        this.modal.querySelector('button.close').onclick = () => {
++            this.modalDisplay();
++        }
++        this.modalBg.onclick = () => {
++            this.modalDisplay();
++        }
+     }
+ 
+-    modalRequest (request, obj)
+-    {
++    modalRequest(request, obj) {
+         const xhttp = new XMLHttpRequest();
+-        xhttp.onreadystatechange = function() {
+-            if (this.readyState === 4 && this.status === 200) { GridStage.modal.modalResponse(obj, this.responseText);  }
++        xhttp.onreadystatechange = function () {
++            if (this.readyState === 4 && this.status === 200) {
++                GridStage.modal.modalResponse(obj, this.responseText);
++            }
+         };
+         xhttp.open("GET", request.url, true);
+         xhttp.send();
+     }
+ 
+-    modalResponse (obj, response)
+-    {
++    modalResponse(obj, response) {
+         this.renderModalBody(response);
+ 
+         if (this.modalBody.querySelector('[data-service-js]')) {
+@@ -78,29 +82,30 @@
+         }
+     }
+ 
+-    modalTitle (strTitle)
+-    {
++    modalTitle(strTitle) {
+         this.modalHead.querySelector('.title').innerHTML = strTitle;
+     }
+ 
+-    loadService (obj, serviceUrl)
+-    {
+-        const domModal = {modal : this.modal, container : this.modalContainer, head : this.modalHead, body : this.modalBody, footer : this.modalFooter}
++    loadService(obj, serviceUrl) {
++        const domModal = {modal: this.modal, container: this.modalContainer, head: this.modalHead, body: this.modalBody, footer: this.modalFooter}
+         const script = document.createElement('script');
+ 
+         script.onload = function () {
+             if (modalService) {
+-                if (typeof modalService.setConfig === 'function') { modalService.setConfig(obj, domModal); }
+-                if (typeof modalService.setView === 'function') { modalService.setView(); }
++                if (typeof modalService.setConfig === 'function') {
++                    modalService.setConfig(obj, domModal);
++                }
++                if (typeof modalService.setView === 'function') {
++                    modalService.setView();
++                }
+             }
+         };
+         script.src = serviceUrl;
+-        
++
+         this.modalBody.appendChild(script);
+     }
+ 
+-    renderModalBody (response)
+-    {
++    renderModalBody(response) {
+         this.modalBody.innerHTML = response;
+ 
+         this.modalDisplay();

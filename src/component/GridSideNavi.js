@@ -1,24 +1,23 @@
-class GridSideNavi extends GridComponent
-{
+import {GridComponent} from "../service/GridComponent";
+
+class GridSideNavi extends GridComponent {
     selectedIndex; // Active content index
     config; // Slide settings
 
-    constructor (obj, nameSpace)
-    {
+    constructor(obj, nameSpace) {
         super(obj, nameSpace);
 
-        this.eventConfig = [ {selector : ".btn.icon", action : "onclick", callBack : "slideTo"}, ];
+        this.eventConfig = [{selector: ".btn.icon", action: "onclick", callBack: "slideTo"},];
         // Set active content index default -1
         this.selectedIndex = -1;
         // Default settings for container position
-        this.config = { slideIn : 0, slideOut : 0, slideFrom : ''}
+        this.config = {slideIn: 0, slideOut: 0, slideFrom: ''}
 
         this.setConfig();
         this.setEvents();
     }
 
-    setConfig ()
-    {
+    setConfig() {
         if (this.container.querySelector('ul.sidenavi-menu')) {
             // End position, shows content
             this.config.slideOut = this.container.offsetWidth - this.container.querySelector('ul.sidenavi-menu').offsetWidth;
@@ -28,8 +27,8 @@ class GridSideNavi extends GridComponent
             this.container.querySelector('.sidenavi-content').classList.add(this.config.slideFrom);
         }
     }
-    slideTo (obj)
-    {
+
+    slideTo(obj) {
         // New container (left,right,bottom,top) value
         const slideTo = (this.container.style[this.config.slideFrom] === '' || this.container.style[this.config.slideFrom] === -this.config.slideOut + 'px') ? this.config.slideIn : -this.config.slideOut;
         // Get menu item index
@@ -50,8 +49,7 @@ class GridSideNavi extends GridComponent
         }
     }
 
-    setSelectedIndex (index)
-    {
+    setSelectedIndex(index) {
         // Check if active content is set
         // remove class if exists
         if (this.container.querySelectorAll('.content.active').length) {
@@ -63,8 +61,7 @@ class GridSideNavi extends GridComponent
         this.selectedIndex = index;
     }
 
-    getSlideFrom ()
-    {
+    getSlideFrom() {
         // Get direction to slide (left,right,bottom,top)
         return (this.container.classList.contains('left'))
             ? 'left'

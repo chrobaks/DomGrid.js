@@ -1,19 +1,18 @@
-class GridElement
-{
+export class GridElement {
     parent;
     container;
     eventConfig;
 
-    constructor (container, parent)
-    {
+    constructor(container, parent) {
         this.parent = parent;
         this.container = container;
         this.eventConfig = [];
     }
 
-    setEvents ()
-    {
-        if (!this.eventConfig.length) {return false;}
+    setEvents() {
+        if (!this.eventConfig.length) {
+            return false;
+        }
 
         this.eventConfig.map((conf) => {
 
@@ -24,8 +23,8 @@ class GridElement
                     obj[conf.action] = () => {
 
                         const event = (conf.hasOwnProperty('callBack')) ? conf.callBack : null;
-                        
-                        if (typeof this[event] !== 'undefined') { 
+
+                        if (typeof this[event] !== 'undefined') {
                             if (conf.hasOwnProperty('callParam')) {
                                 this[event](obj, conf.callParam);
                             } else {
@@ -38,23 +37,20 @@ class GridElement
         });
     }
 
-    setComponentAction (act)
-    {
-        const args = (arguments.length > 1) 
-            ? [this.parent.nameSpace, this.parent.componentId, act, arguments[1]] 
+    setComponentAction(act) {
+        const args = (arguments.length > 1)
+            ? [this.parent.nameSpace, this.parent.componentId, act, arguments[1]]
             : [this.parent.nameSpace, this.parent.componentId, act];
-            
+
         GridStage.setNameSpaceComponentAction(...args);
     }
 
-    setParentAction (act)
-    {
+    setParentAction(act) {
         (arguments.length > 1) ? this.parent.componentInstance[act](arguments[1]) : this.parent.componentInstance[act]();
     }
-    
 
-    setElementRequest (requestAct, request)
-    {
+
+    setElementRequest(requestAct, request) {
         request.component = this;
 
         GridStage[requestAct](request);

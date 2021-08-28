@@ -1,0 +1,11 @@
+diff a/src/service/GridUi.js b/src/service/GridUi.js	(rejected hunks)
+@@ -137,8 +132,7 @@
+         return result;
+     }
+ 
+-    static formList (container)
+-    {
++    static formList(container) {
+         return [
+             ...container.querySelectorAll("input"),
+             ...container.querySelectorAll("select"),
