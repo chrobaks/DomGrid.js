@@ -1,4 +1,7 @@
 # DomGrid.js
+
+**@version:** 0.2
+
 ### Singlepage Javascript framework
 
 Small Javascript object settings for personalized Web-Applications.
@@ -17,13 +20,16 @@ You can build your own version cycle up to the requirements of your Application,
 ### Structure
 
 - js
-- - DomGrid.js
-- - GridModal.js
-- - GridComponent.js
-- - GridElement.js
-- - GridUi.js
+- - core/DomGrid.js
+- - core/GridModal.js
+- - core/GridComponent.js
+- - core/GridModule.js
+- - core/GridElement.js
+- - core/GridUi.js
 - - component/
 - - element/
+- - route/
+- - module/
 - - service/
 
 - css
@@ -43,6 +49,9 @@ You can build your own version cycle up to the requirements of your Application,
 
 #### GridComponent.js
 Core component class extend by component
+
+#### GridModule.js
+Core module class extend by module
 
 #### GridElement.js
 Core element class extend by element
