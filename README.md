@@ -26,6 +26,7 @@ You can build your own version cycle up to the requirements of your Application,
 - - core/GridModule.js
 - - core/GridElement.js
 - - core/GridUi.js
+- - core/GridAjax.js
 - - component/
 - - element/
 - - route/
