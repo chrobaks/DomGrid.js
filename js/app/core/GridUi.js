@@ -51,9 +51,9 @@ class GridUi
         key = keyArgs[0];
 
         for(let i = 1; i < keyArgs.length; i++) { key += keyArgs[i].charAt(0).toUpperCase() + keyArgs[i].slice(1)}
-        
+
         if (obj.dataset.hasOwnProperty(key)) {
-            
+
             result = true;
 
             if (value && this.dataSetValue(obj, key) !== value) {
@@ -69,11 +69,11 @@ class GridUi
         let result = false;
 
         if (arrDate.length && arrDate.length === 3) {
-            
+
             const check = new Date(arrDate[0]+"-"+arrDate[1]+"-"+arrDate[2]);
             result = (check.toString() !== "Invalid Date");
         }
-        
+
         return result;
     }
 
@@ -83,7 +83,7 @@ class GridUi
         const endArg = to.split('.');
         const startDate = new Date(startArg[1]+"/"+startArg[0]+"/"+startArg[2]).getTime();
         const endDate = new Date(endArg[1]+"/"+endArg[0]+"/"+endArg[2]).getTime();
-        
+
         return (startArg <= endArg);
     }
 
@@ -163,7 +163,7 @@ class GridUi
             formList.map((elmn) => {
 
                 formData.append(elmn.name, elmn.value.trim());
-                
+
                 if (elmn.value === "") {
                     emptyKeys.push(elmn.name);
                 }
@@ -183,20 +183,30 @@ class GridUi
 
         return formData;
     }
-    
+
+    static formPostData (arrArgs)
+    {
+        const formData = this.formData(arrArgs);
+        const result = Array
+            .from(formData.entries())
+            .reduce((m, [ key, value ]) => Object.assign(m, { [key]: value }), {});
+
+        return result;
+    }
+
     static formFileData (id, appType, arrArgs)
     {
         const formData = new FormData();
-        
+
         for (let i = 0; i < arrArgs.length; i++) {
-            
+
             const file = arrArgs[i];
-            
+
             // Check file type is allowed in appType
             if (!appType.includes(file.type)) {
                 continue;
             }
-        
+
             // Add file data
             formData.append(id, file, file.name);
         }
@@ -215,7 +225,7 @@ class GridUi
     {
         list.map((obj) => {
             const cacheValue = GridUi.dataSetValue(obj, "cacheValue");
-            if (cacheValue && cacheValue !== obj.value) { 
+            if (cacheValue && cacheValue !== obj.value) {
                 obj.value = GridUi.dataSetValue(obj, "cacheValue");
             }
         });

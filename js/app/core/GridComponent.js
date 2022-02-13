@@ -102,8 +102,7 @@ class GridComponent
     setComponentRequest (requestAct, request)
     {
         request.component = this;
-
-        GridStage[requestAct](request);
+        GridAjax[requestAct](request);
     }
 
     getState (key)

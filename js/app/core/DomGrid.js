@@ -18,6 +18,9 @@ class DomGrid
         ];
         // Load required js
         if (this.initRegisteredScripts()) {this.loadScript(0);}
+
+        // Set ajax polyfill status
+        GridAjax.setUsePolyFill(false);
     }
 
     initRegisteredScripts ()
@@ -91,12 +94,12 @@ class DomGrid
                     if (typeof eval(obj.dataset.gridElement) !== 'undefined') {
                         // Create object instance
                         const element = eval(obj.dataset.gridElement);
-                        
+
                         new element(obj, {componentInstance : componentInstance, nameSpace : parentNameSpace, componentId : component.dataset.gridComponent});
                     }
                 }
             });
-        } 
+        }
     }
 
     loadScript (scriptIndex)
@@ -116,57 +119,26 @@ class DomGrid
                 }
             }
         };
-        
+
         script.onerror = function () {
             GridStage.setError("JS-Script kann nicht geladen werden: " + script.src);
         };
 
         script.src = this.config.scriptPath + this.registeredScripts[scriptIndex] + ".js?" + Date.now();
-        
+
         document.querySelector("head").appendChild(script);
-    }
-
-    postRequest (request)
-    {
-        const xhttp = new XMLHttpRequest();
-        xhttp.open("POST", request.url, true);
-        xhttp.send(request.formData);
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                const responseData = JSON.parse(this.responseText);
-                const status = (responseData.hasOwnProperty('status')) ? responseData.status : '';
-                if (request.hasOwnProperty('response')) {
-                    request.component[request.response](responseData);
-                }
-            }
-        };
-    }
-
-    tplRequest (request)
-    {
-        const xhttp = new XMLHttpRequest();
-        xhttp.open("GET", request.url, true);
-        xhttp.onreadystatechange = function() { 
-            if (this.readyState == 4 && this.status == 200) {
-                const status = GridUi.getJsonFromStr('status', this.responseText);
-                if (request.hasOwnProperty('response')) {
-                    request.component[request.response](this.responseText);
-                }
-            } 
-        };
-        xhttp.send(); 
     }
 
     setNameSpaceComponentAction (nameSpaceId, componentId, method)
     {
         if (this.nameSpaces.hasOwnProperty(nameSpaceId) && this.nameSpaces[nameSpaceId].components.hasOwnProperty(componentId)) {
             const component = this.nameSpaces[nameSpaceId].components[componentId];
-            if (typeof component[method] === 'function') { 
+            if (typeof component[method] === 'function') {
                 if (arguments.length > 3) {
                     component[method](arguments[3]);
                 } else {
                     component[method]();
-                } 
+                }
             }
         }
     }
@@ -194,12 +166,12 @@ class DomGrid
         let result = null;
         if (this.nameSpaces.hasOwnProperty(nameSpaceId) && this.nameSpaces[nameSpaceId].components.hasOwnProperty(componentId)) {
             const component = this.nameSpaces[nameSpaceId].components[componentId];
-            if (typeof component[method] === 'function') { 
+            if (typeof component[method] === 'function') {
                 if (arguments.length > 3) {
-                     result = component[method](arguments[3]);
+                    result = component[method](arguments[3]);
                 } else {
                     result = component[method]();
-                } 
+                }
             }
         }
 
