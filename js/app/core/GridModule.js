@@ -33,6 +33,6 @@ class GridModule
     {
         request.component = this;
 
-        GridStage[requestAct](request);
+        GridAjax[requestAct](request);
     }
 }
