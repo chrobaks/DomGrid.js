@@ -65,4 +65,32 @@ class GridAjax
         };
         xhttp.send();
     }
+
+    /**
+     *
+     * @param request object
+     */
+    static modalRequest (request, obj)
+    {
+        if (this.usePolyFill) {
+            const xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState === 4 && this.status === 200) {
+                    GridStage.modal.modalResponse(obj, this.responseText);
+                }
+            };
+            xhttp.open("GET", request.url, true);
+            xhttp.send();
+        } else {
+            fetch(request.url, {
+                method : 'get',
+                mode:    'cors',
+            })
+                .then((res) => res.text())
+                .then((data) => {
+                    GridStage.modal.modalResponse(obj, data);
+                })
+                .catch((error) => console.error(error));
+        }
+    }
 }

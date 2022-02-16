@@ -58,14 +58,7 @@ class gridModal
 
     modalRequest (request, obj)
     {
-        const xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState === 4 && this.status === 200) {
-                GridStage.modal.modalResponse(obj, this.responseText);
-            }
-        };
-        xhttp.open("GET", request.url, true);
-        xhttp.send();
+        GridAjax.modalRequest(request, obj);
     }
 
     modalResponse (obj, response)
