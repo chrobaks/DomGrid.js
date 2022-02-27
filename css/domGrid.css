@@ -79,16 +79,8 @@
 .dataTable-toolbar .dataTable-search-wrapper-str.active,
 .dataTable-toolbar .dataTable-search-wrapper-date.active {display: flex;}
 .dataTable-toolbar .dataTable-search-wrapper-date {position: relative;background-color: #2E9AFE;color: #fff;}
-.dataTable-toolbar .dataTable-search-wrapper-date > span {
-    padding: 0 3px;
-}
-.dataTable-toolbar .dataTable-search-wrapper-date .date-menu {
-    display: none;
-    position: absolute;
-    top: 27px;
-    z-index:2;
-    white-space: nowrap;
-}
+.dataTable-toolbar .dataTable-search-wrapper-date > span {padding: 0 3px;}
+.dataTable-toolbar .dataTable-search-wrapper-date .date-menu {display: none;position: absolute;top: 27px;z-index:2;white-space: nowrap;}
 .dataTable-toolbar .dataTable-search-wrapper-date input[type="text"] {width: 80px;border:0;}
 .dataTable-toolbar .dataTable-search-wrapper-str input[type="text"] {width: 130px;border:0;}
 .dataTable-toolbar .dataTable-search-wrapper-str .btn-search,
@@ -126,22 +118,65 @@
 .order-box-container svg:first-child {margin-bottom:1px;}
 .order-box-container .svg-arrow use {fill: #666 !important;}
 .order-box-container .svg-arrow-item.active .svg-arrow use {fill: #30bf2d !important;}
-
 /* -------------- SideNavi -------------- */
+.grid-sidenavi {
+    --container-top: 120px;
+    --container-width: 410px;
+    --container-height: 200px;
+    --container-posx: -370px;
+    --ul-width: 40px;
+    --li-height: 39px;
+    --li-bgc: #000;
+    --li-item-bgc: #0d6efd;
+    --li-item-color: #fff;
+    --content-width: 370px;
+    --content-bgc: #4c5367;
+    --content-page-color: #9fa9b7;
+    --content-page-padding: 10px;
+}
+.grid-sidenavi,
+.grid-sidenavi ul,
+.grid-sidenavi ul li {margin:0;padding:0;}
 .grid-sidenavi {position:fixed;z-index: 99999;}
-.grid-sidenavi.left,
-.grid-sidenavi.right  {width: 405px;height: 200px;top: 120px;margin:0;padding:0;}
-.grid-sidenavi.left {left: -370px;}
-.grid-sidenavi.right {right: -370px;}
+.grid-sidenavi  {width: var(--container-width);height: var(--container-height);top: var(--container-top);}
+.grid-sidenavi.left {left: var(--container-posx);}
+.grid-sidenavi.right {right: var(--container-posx);}
+.grid-sidenavi ul {width: var(--ul-width);list-style:none;}
+.grid-sidenavi ul li {width: var(--ul-width);height: var(--li-height);background-color: var(--li-bgc);margin-bottom: 1px !important}
+.grid-sidenavi .sidenavi-content {overflow:hidden;width: var(--content-width);height: var(--container-height);margin: 0;padding: 0;background-color: var(--content-bgc);}
+.grid-sidenavi .sidenavi-content .content-page {display: none;padding: var(--content-page-padding);color: var(--content-page-color);}
+.grid-sidenavi .sidenavi-content .content-page.active {display: block;}
+.grid-sidenavi .sidenavi-menu li.btn-slide .btn-slide-item {line-height: 2.5em;cursor: pointer;text-align: center;color: var(--li-item-color);background-color: var(--li-item-bgc);width: var(--li-height);height: var(--li-height);}
 .grid-sidenavi.left .sidenavi-menu,
-.grid-sidenavi.right .sidenavi-content {float: right;}
+.grid-sidenavi.right .sidenavi-content,
+.grid-sidenavi.left .sidenavi-menu li.btn-slide .btn-slide-item {float: right;}
 .grid-sidenavi.right .sidenavi-menu,
-.grid-sidenavi.left .sidenavi-content {float: left;}
-.grid-sidenavi.bottom {bottom: 0;}
-.grid-sidenavi ul {width: 35px;list-style:none;margin: 0;padding: 0;}
-.grid-sidenavi ul li {width: 100%;height: 40px;padding: 0;text-align: center;}
-.grid-sidenavi .sidenavi-content {width: calc(100% - 35px);height: 200px;margin: 0;padding: 0;border-top: 1px solid cornflowerblue;border-bottom: 1px solid cornflowerblue;background-color: #4c5367;}
-.grid-sidenavi .sidenavi-content.left {border-right: 1px solid cornflowerblue;}
-.grid-sidenavi .sidenavi-content.right {border-left: 1px solid cornflowerblue;}
-.grid-sidenavi .sidenavi-content .content {width: 100%;padding: 30px;display: none;color: #9fa9b7;}
-.grid-sidenavi .sidenavi-content .content.active {display: block;}
+.grid-sidenavi.left .sidenavi-content,
+.grid-sidenavi.right .sidenavi-menu li.btn-slide .btn-slide-item {float: left;}
+/* -------------- Button btn -------------- */
+.btn {
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.btn-primary {color: #fff;background-color: #0d6efd;border-color: #0d6efd;}
+.btn-sm {
+    padding: .25rem .5rem;
+    font-size: .875rem;
+    line-height: 1.5;
+    border-radius: .2rem;
+}
