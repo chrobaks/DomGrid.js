@@ -1,6 +1,6 @@
 # DomGrid.js
 
-**@version:** 0.2
+**@version:** 0.6
 
 ### Singlepage Javascript framework
 
@@ -21,6 +21,7 @@ You can build your own version cycle up to the requirements of your Application,
 
 - js
 - - core/DomGrid.js
+- - core/GridReady.js
 - - core/GridModal.js
 - - core/GridComponent.js
 - - core/GridModule.js
@@ -42,6 +43,9 @@ You can build your own version cycle up to the requirements of your Application,
 - Instantiate GridModal
 - Load and instantiate component/element
 - Ajax-Request methods
+
+#### GridReady.js
+- Dom ready event caller
 
 #### GridModal.js
 - Show dynamic modal views

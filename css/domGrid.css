@@ -1,3 +1,12 @@
+/**
+*-------------------------------------------
+* DomGrid.css
+*-------------------------------------------
+* @version 2.4
+* @createAt 28.02.2022 17:14
+* @author NetCoDev
+*-------------------------------------------
+**/
 /* Grid dom element structure */
 .grid-container {width: calc(100% - 120px);margin: 0 auto;}
 .grid-container.grid-content {width: calc(100% - 40px);margin: 0 auto;padding:30px 0;}
@@ -36,20 +45,7 @@
 #gridModal .grid-modal-body { padding: 30px 0; background-color: #e5e5e5; overflow-y: auto;}
 #gridModal .grid-modal-body .modal-body-container { padding: 10px; }
 /* Grid datepicker structure */
-.date-picker { display:none;position: absolute; font-family:Arial; font-size: 11px; width: 194px;background-color: #999;padding: 4px 0 4px 4px;}
-.date-picker .date-picker-year , .date-picker .date-picker-month { font-family:Arial; width: 100%; display: flex;flex-wrap: wrap;padding: 3px 0 3px 0;}
-.date-picker .date-picker-year .btn-change , .date-picker .date-picker-month .btn-change {width : 25px; height: 25px; text-align: center; cursor: pointer;font-weight: bold;line-height: 1.9em;background-color: rgba(255, 255, 255, 0.5);}
-.date-picker .date-picker-year .btn-change:hover , .date-picker .date-picker-month .btn-change:hover {background-color: #333; color: #e5e5e5;}
-.date-picker .date-picker-year .year-label, .date-picker .date-picker-month .month-label { width: calc(100% - 56px); height: 25px; text-align: center;line-height: 1.9em; background-color: #f5f5f5;color: #000;}
-.date-picker .date-picker-items { font-family:Arial; width: 100%; display: flex;flex-wrap: wrap;padding: 1px 0 1px 0;}
-.date-picker .item {width : 25px; height: 25px;margin: 0 1px 1px 1px;background-color: rgba(255, 255, 255, 0.5);cursor: pointer;text-align: center;line-height: 1.9em;}
-.date-picker .item.active, .date-picker .item:hover {background-color: #333 !important; color: #e5e5e5;}
-.date-picker .item.today {background-color: #666; color: #e5e5e5;}
-/* Grid timepicker structure */
-.dom-grid-time-picker-container {position: absolute;width: 120px;height: 120px;overflow-y: auto;background-color: #e6e6e6;}
-.dom-grid-time-picker-container .time-item {width: 100%;padding: 3px 0;text-align: center;cursor: pointer;}
-.dom-grid-time-picker-container .time-selected {background-color: cornflowerblue;}
-.dom-grid-time-picker-container .time-hidden {display: none;}
+
 /* Grid dataTable structure */
 .dataTable { width: 100%; overflow: hidden; border: 1px solid #ccc; }
 .dataTable-toolbar,
