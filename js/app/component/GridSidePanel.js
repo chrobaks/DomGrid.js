@@ -6,13 +6,15 @@ class GridSidePanel extends GridComponent
 
         this.selector = {
             btnContainer: 'ul.sidenavi-menu',
-            btnItem: '.btn-slide',
+            btnSlide: '.btn-slide',
+            btnSlideItem: '.btn-slide-item',
+            btnSlideItemActive: '.btn-slide-item.active',
             content: '.sidenavi-content',
             contentPage: '.content-page',
             contentPageActive: '.content-page.active',
         };
         this.btnContainer = this.container.querySelector(this.selector.btnContainer);
-        this.btnList = this.btnContainer.querySelectorAll(this.selector.btnItem);
+        this.btnList = this.btnContainer.querySelectorAll(this.selector.btnSlide);
         this.btnIndexList = Array.prototype.slice.call(this.btnList);
         this.start = undefined;
         this.previousTimeStamp = undefined;
@@ -24,12 +26,15 @@ class GridSidePanel extends GridComponent
         this.posIn = 0;
         this.posOut = 0;
         this.selectedIndex = -1;
+        this.maxElapsed = 0;
         this.container.querySelector(this.selector.content).classList.add(this.slideFrom);
-        this.eventConfig = [ {selector : this.selector.btnItem, action : "onclick", callBack : "setSlide"}, ];
+        this.eventConfig = [ {selector : this.selector.btnSlide, action : "onclick", callBack : "setSlide"}, ];
 
         this.setPosIn();
+        this.setMaxElapsed();
         this.setEvents();
     }
+
     setPosIn ()
     {
         this.posIn = (this.slideFrom === 'left')
@@ -37,12 +42,21 @@ class GridSidePanel extends GridComponent
             : (window.innerWidth - this.container.offsetLeft - this.container.offsetWidth) - (window.innerWidth - document.documentElement.clientWidth);
     }
 
+    setMaxElapsed ()
+    {
+        this.maxElapsed = Math.abs(this.posIn)*10;
+    }
+
     setSelectedIndex (index)
     {
         if (this.container.querySelectorAll(this.selector.contentPageActive).length) {
             this.container.querySelectorAll(this.selector.contentPageActive)[0].classList.remove('active');
         }
+        if (this.container.querySelectorAll(this.selector.btnSlideItemActive).length) {
+            this.container.querySelectorAll(this.selector.btnSlideItemActive)[0].classList.remove('active');
+        }
         this.container.querySelectorAll(this.selector.contentPage)[index].classList.add('active');
+        this.container.querySelectorAll(this.selector.btnSlideItem)[index].classList.add('active');
         this.selectedIndex = index;
     }
 
@@ -73,7 +87,10 @@ class GridSidePanel extends GridComponent
     {
         if (this.start === undefined) {this.start = timestamp;}
         const elapsed = timestamp - this.start;
-
+        if (this.direction === 'out' && this.selectedIndex !== -1) {
+            this.selectedIndex = -1;
+            this.container.querySelectorAll(this.selector.btnSlideItemActive)[0].classList.remove('active');
+        }
         if (this.previousTimeStamp !== timestamp) {
             this.count = (this.direction === 'in')
                 ? this.posIn + (this.speed * elapsed)
@@ -90,12 +107,9 @@ class GridSidePanel extends GridComponent
             ) {
                 this.done = true;
                 this.direction = (this.direction === "out") ? 'in' : 'out';
-                if (this.direction === 'in' ) {
-                    this.selectedIndex = -1;
-                }
             }
         }
-        if (elapsed < 3700) {
+        if (elapsed < this.maxElapsed) {
             this.previousTimeStamp = timestamp
             !this.done && window.requestAnimationFrame(this.slide.bind(this));
         }
