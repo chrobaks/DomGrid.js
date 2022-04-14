@@ -1,4 +1,4 @@
-class GridFormList extends GridComponent
+class GridFormModal extends GridComponent
 {
     constructor (obj, nameSpace)
     {
@@ -19,7 +19,7 @@ class GridFormList extends GridComponent
         this.requestTriggerUrl = (GridUi.dataSetValue(obj, 'triggerUrl') === "")
             ? url : GridUi.dataSetValue(obj, 'triggerUrl');
         GridStage.modal.modalTitle("Neue Daten");
-        GridStage.modal.modalRequest({url : url}, {callBack : callBack});
+        GridStage.modal.modalRequest({url : url}, {callBack : callBack}, "save", "expand");
     }
 
     setModalRequest (formData)
@@ -42,19 +42,8 @@ class GridFormList extends GridComponent
         // Set response message
         this.setMessage(res);
 
-        if (GridUi.requestStatus(res)) {
-            this.renderBody(res.data);
+        if (GridUi.requestStatus(res) && this.gridWatcher) {
+            GridStage.GridWatcher.runWatcher(this.gridWatcher);
         }
-    }
-
-    renderBody (data)
-    {
-        const row = document.createElement('tr');
-        const cell = document.createElement('td');
-
-        cell.innerHTML = data.name;
-        row.append(cell);
-
-        this.container.querySelector('tbody').append(row);
     }
 }

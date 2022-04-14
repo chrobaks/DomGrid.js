@@ -1,3 +1,14 @@
+/**
+ *-------------------------------------------
+ * Class GridSidePanel
+ *-------------------------------------------
+ * @version 1.0
+ * @createAt 01.11.2020 20:17
+ * @updatedAt 01.03.2022 14:52
+ * @author NetCoDev
+ *-------------------------------------------
+ **/
+
 class GridSidePanel extends GridComponent
 {
     constructor (obj, nameSpace)
@@ -67,6 +78,9 @@ class GridSidePanel extends GridComponent
             if (this.selectedIndex === -1) {
                 this.setSelectedIndex(index);
             }
+            if (this.direction === 'out') {
+                this.container.querySelectorAll(this.selector.btnSlideItemActive)[0].classList.remove('active');
+            }
             this.count = (this.direction === 'out') ? this.posOut : this.posIn;
             this.start = undefined;
             this.previousTimeStamp = undefined;
@@ -89,7 +103,7 @@ class GridSidePanel extends GridComponent
         const elapsed = timestamp - this.start;
         if (this.direction === 'out' && this.selectedIndex !== -1) {
             this.selectedIndex = -1;
-            this.container.querySelectorAll(this.selector.btnSlideItemActive)[0].classList.remove('active');
+            // this.container.querySelectorAll(this.selector.btnSlideItemActive)[0].classList.remove('active');
         }
         if (this.previousTimeStamp !== timestamp) {
             this.count = (this.direction === 'in')

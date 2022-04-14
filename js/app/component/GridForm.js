@@ -5,13 +5,8 @@ class GridForm extends GridComponent
         super(obj, nameSpace); 
 
         this.eventConfig = [
-            {selector : "button.btn-primary", action : "onclick", callBack : "setRequest"},
+            {selector : "button.btn-primary", action : "click", callBack : "setRequest"},
         ];
-
-        this.setState([
-            {id : 'dateFrom', elmn : this.container.querySelectorAll('input.datepicker')[0]},
-            {id : 'dateTo', elmn : this.container.querySelectorAll('input.datepicker')[1]}
-        ]);
 
         this.setEvents();
     }
@@ -42,7 +37,13 @@ class GridForm extends GridComponent
             this.setMessage("Die Daten werden gespeichert, bitte warten ..");
 
             // Send post request
-            // this.setComponentRequest("postRequest", {url : GridUi.dataSetValue(obj, "requestUrl"), formData : formResults.formData, response : "setResponse"});
+            this.setComponentRequest(
+                "postRequest",
+                {
+                    url : GridUi.dataSetValue(obj, "requestUrl"),
+                    formData : formResults.formData,
+                    response : "setResponse"
+                });
         }
     }
 } 

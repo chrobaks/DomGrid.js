@@ -2,8 +2,9 @@
 *-------------------------------------------
 * DateTimePicker.js
 *-------------------------------------------
-* @version 2.4
+* @version 2.4.1
 * @createAt 28.02.2022 17:14
+* @updatedAt 05.03.2022 14:52
 * @author NetCoDev
 *-------------------------------------------
 **/
@@ -1584,72 +1585,84 @@ class DateTimePicker
     }
 
     initDateTimePicker() {
-        [...document.getElementsByClassName(this.dateTimeSelectors.selector)].map($e => {
-            const container = this.getPickerContainer($e, this.dateTimeSelectors);
-            container.append(DateTimeUi.getPickerTemplate(this.dateSelectors.selector));
-            container.append(DateTimeUi.getPickerTemplate(this.timeSelectors.selector));
-            const dateContainer = container.getElementsByClassName(this.dateSelectors.container)[0];
-            const timeContainer = container.getElementsByClassName(this.timeSelectors.container)[0];
-            const pickerContainer = {
-                container: container,
-                dateContainer: {
-                    container: dateContainer,
-                    labelDays: dateContainer.getElementsByClassName(this.dateSelectors.pickerLabelDays)[0],
-                    labelYear: dateContainer.getElementsByClassName(this.dateSelectors.pickerLabelYear)[0],
-                    dropDown: dateContainer.getElementsByClassName(this.dateSelectors.pickerDropdown)[0],
-                    dropDownSelect: dateContainer.getElementsByClassName(this.dateSelectors.pickerDropdownSelect)[0],
-                    pickerDays: dateContainer.getElementsByClassName(this.dateSelectors.pickerDays)[0],
-                },
-                timeContainer: {
-                    container: timeContainer,
-                    itemList: timeContainer.getElementsByClassName(DateTimeUi.selector(["timePicker", "itemList"]))[0]
-                }
-            };
-            pickerContainer.dateContainer.container.classList.add('is-embedded');
-            pickerContainer.timeContainer.container.classList.add('is-embedded');
-
-            const pickerObj = new DateTimeObj({input: $e, selector: this.dateTimeSelectors.selector}, pickerContainer, this.viewProxy);
-            if (!$e.classList.contains('build-in')) {
-                this.setPickerEvents(pickerObj, $e, container);
-            }
-            this.setTimePicker(pickerObj.TimeObj);
-            this.setDatePicker(pickerObj.DateObj);
+        [...document.getElementsByClassName(this.dateTimeSelectors.selector)].map($input => {
+            this.setDateTimeObject($input);
         });
     }
 
     initTimePicker() {
-        [...document.getElementsByClassName(this.timeSelectors.selector)].map($e => {
-            const container = this.getPickerContainer($e, this.timeSelectors);
-            const pickerContainer = {
-                container: container,
-                itemList: container.getElementsByClassName(DateTimeUi.selector(["timePicker", "itemList"]))[0],
-            };
-            const pickerObj = new TimeObj({input: $e, selector: this.timeSelectors.selector}, pickerContainer, this.viewProxy);
-            if (!$e.classList.contains('build-in')) {
-                this.setPickerEvents(pickerObj, $e, container);
-            }
-            this.setTimePicker(pickerObj);
+        [...document.getElementsByClassName(this.timeSelectors.selector)].map($input => {
+            this.setTimeObject($input);
         });
     }
 
     initDatePicker() {
-        [...document.getElementsByClassName(this.dateSelectors.selector)].map($e => {
-            const container = this.getPickerContainer($e, this.dateSelectors);
-            const pickerContainer = {
-                container: container,
-                labelDays: container.getElementsByClassName(this.dateSelectors.pickerLabelDays)[0],
-                labelYear: container.getElementsByClassName(this.dateSelectors.pickerLabelYear)[0],
-                dropDown: container.getElementsByClassName(this.dateSelectors.pickerDropdown)[0],
-                dropDownSelect: container.getElementsByClassName(this.dateSelectors.pickerDropdownSelect)[0],
-                pickerDays: container.getElementsByClassName(this.dateSelectors.pickerDays)[0],
-            };
-
-            const pickerObj = new DateObj({input: $e, selector: this.dateSelectors.selector}, pickerContainer, this.viewProxy);
-            if (!$e.classList.contains('build-in')) {
-                this.setPickerEvents(pickerObj, $e, container);
-            }
-            this.setDatePicker(pickerObj);
+        [...document.getElementsByClassName(this.dateSelectors.selector)].map($input => {
+            this.setDateObject($input);
         });
+    }
+
+    setDateTimeObject ($input) {
+        const container = this.getPickerContainer($input, this.dateTimeSelectors);
+        container.append(DateTimeUi.getPickerTemplate(this.dateSelectors.selector));
+        container.append(DateTimeUi.getPickerTemplate(this.timeSelectors.selector));
+        const dateContainer = container.getElementsByClassName(this.dateSelectors.container)[0];
+        const timeContainer = container.getElementsByClassName(this.timeSelectors.container)[0];
+        const pickerContainer = {
+            container: container,
+            dateContainer: {
+                container: dateContainer,
+                labelDays: dateContainer.getElementsByClassName(this.dateSelectors.pickerLabelDays)[0],
+                labelYear: dateContainer.getElementsByClassName(this.dateSelectors.pickerLabelYear)[0],
+                dropDown: dateContainer.getElementsByClassName(this.dateSelectors.pickerDropdown)[0],
+                dropDownSelect: dateContainer.getElementsByClassName(this.dateSelectors.pickerDropdownSelect)[0],
+                pickerDays: dateContainer.getElementsByClassName(this.dateSelectors.pickerDays)[0],
+            },
+            timeContainer: {
+                container: timeContainer,
+                itemList: timeContainer.getElementsByClassName(DateTimeUi.selector(["timePicker", "itemList"]))[0]
+            }
+        };
+        pickerContainer.dateContainer.container.classList.add('is-embedded');
+        pickerContainer.timeContainer.container.classList.add('is-embedded');
+
+        const pickerObj = new DateTimeObj({input: $input, selector: this.dateTimeSelectors.selector}, pickerContainer, this.viewProxy);
+        if (!$input.classList.contains('build-in')) {
+            this.setPickerEvents(pickerObj, $input, container);
+        }
+        this.setTimePicker(pickerObj.TimeObj);
+        this.setDatePicker(pickerObj.DateObj);
+    }
+
+    setTimeObject ($input) {
+        const container = this.getPickerContainer($input, this.timeSelectors);
+        const pickerContainer = {
+            container: container,
+            itemList: container.getElementsByClassName(DateTimeUi.selector(["timePicker", "itemList"]))[0],
+        };
+        const pickerObj = new TimeObj({input: $input, selector: this.timeSelectors.selector}, pickerContainer, this.viewProxy);
+        if (!$input.classList.contains('build-in')) {
+            this.setPickerEvents(pickerObj, $input, container);
+        }
+        this.setTimePicker(pickerObj);
+    }
+
+    setDateObject ($input) {
+        const container = this.getPickerContainer($input, this.dateSelectors);
+        const pickerContainer = {
+            container: container,
+            labelDays: container.getElementsByClassName(this.dateSelectors.pickerLabelDays)[0],
+            labelYear: container.getElementsByClassName(this.dateSelectors.pickerLabelYear)[0],
+            dropDown: container.getElementsByClassName(this.dateSelectors.pickerDropdown)[0],
+            dropDownSelect: container.getElementsByClassName(this.dateSelectors.pickerDropdownSelect)[0],
+            pickerDays: container.getElementsByClassName(this.dateSelectors.pickerDays)[0],
+        };
+
+        const pickerObj = new DateObj({input: $input, selector: this.dateSelectors.selector}, pickerContainer, this.viewProxy);
+        if (!$input.classList.contains('build-in')) {
+            this.setPickerEvents(pickerObj, $input, container);
+        }
+        this.setDatePicker(pickerObj);
     }
 
     setPickerEvents(pickerObj, input, container) {
@@ -1876,6 +1889,9 @@ class DateTimePicker
         $child.setAttribute('data-value', dayIndex);
         $child.classList.add(selector);
         if (DateTimeUi.checkActualDay(pickerObj.config, dayIndex)) {
+            if(DateTimeUi.checkToday(pickerObj.config, dayIndex)) {
+                $child.classList.add(this.dateSelectors.today);
+            }
             $child.classList.add(this.dateSelectors.selected);
         } else if (DateTimeUi.checkToday(pickerObj.config, dayIndex)) {
             $child.classList.add(this.dateSelectors.today);

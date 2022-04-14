@@ -11,7 +11,6 @@ class GridModule
             const list = (conf.selector !== '')
                 ? conf.container.querySelectorAll(conf.selector)
                 : [conf.container];
-
             if (list && list.length) {
                 [...list].map((obj) => {
                     obj.addEventListener (conf.action,() => {

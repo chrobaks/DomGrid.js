@@ -1,3 +1,14 @@
+/**
+ *-------------------------------------------
+ * GridPageLinkModule.js
+ *-------------------------------------------
+ * @version 1.0
+ * @createAt 17.06.2020 17:30
+ * @updatedAt 01.03.2022 14:52
+ * @author NetCoDev
+ *-------------------------------------------
+ **/
+
 class GridPageLinkModule extends GridModule
 {
     constructor(selector)

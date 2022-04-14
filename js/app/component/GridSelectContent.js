@@ -28,7 +28,6 @@ class GridSelectContent extends GridComponent
             const wrapper = this.container.querySelector('[data-grid-select="' + selectId + '"]');
             wrapper.innerHTML = html;
             // Reset element instance grid elements if exists
-            console.log("renderBody",wrapper.querySelectorAll("[data-grid-element]").length);
             if (wrapper.querySelectorAll("[data-grid-element]").length) {
                 GridStage.initElements(this, this.container, this.nameSpace);
             }

@@ -1,4 +1,15 @@
-class gridModal
+/**
+ *-------------------------------------------
+ * Class GridModal
+ *-------------------------------------------
+ * @version 1.0.5
+ * @createAt 15.06.2019 15:05
+ * @updatedAt 13.04.2022 14:52
+ * @author NetCoDev
+ *-------------------------------------------
+ **/
+
+class GridModal
 {
     constructor ()
     {
@@ -25,6 +36,7 @@ class gridModal
         this.modalHead = this.modal.querySelector('.grid-modal-head');
         this.modalBody = this.modal.querySelector('.grid-modal-body');
         this.modalFooter = this.modal.querySelector('.grid-modal-footer');
+        this.modalType = "save";
 
         this.modalEvent();
     }
@@ -35,11 +47,11 @@ class gridModal
 
         if (this.modal.style.display === 'inline-block') {
             document.body.classList.add('no-scroll');
-            this.modalBg.style.height = document.body.clientHeight + "px";
+            this.modalBg.style.height = window.innerHeight + "px";
             this.modalContainer.style.top = (100 + window.scrollY) + "px";
             [...this.modal.querySelectorAll('button')].map((btn) => {
                 btn.style.display = 'block';
-            })
+            });
         } else {
             document.body.classList.remove('no-scroll');
         }
@@ -56,17 +68,23 @@ class gridModal
         this.modalBg.onclick = () => { this.modalDisplay(); }
     }
 
-    modalRequest (request, obj)
+    modalRequest (request, obj, modalType = "save", modalView = "")
     {
+        this.modalType = modalType;
         GridAjax.modalRequest(request, obj);
+        if (!modalView) {
+            this.modalContainer.classList.remove('expand');
+        } else {
+            this.modalContainer.classList.add('expand');
+        }
     }
 
     modalResponse (obj, response)
     {
+        this.setModalType();
         this.renderModalBody(response);
 
         if (this.modalBody.querySelector('[data-service-js]')) {
-            this.modalFooter.querySelector('.btn.save').style.display = 'block';
             this.loadService(obj, this.modalBody.querySelector('[data-service-js]').dataset.serviceJs)
         } else {
             this.modalFooter.querySelector('.btn.save').style.display = 'none';
@@ -76,6 +94,20 @@ class gridModal
     modalTitle (strTitle)
     {
         this.modalHead.querySelector('.title').innerHTML = strTitle;
+    }
+
+    setModalType ()
+    {
+        switch (this.modalType) {
+            case 'prompt':
+                this.modal.querySelector('button.save').innerHTML = "Daten löschen";
+                this.modal.querySelector('button.close').innerHTML = "Abbrechen";
+                break;
+            default:
+                this.modal.querySelector('button.save').innerHTML = "Daten speichern";
+                this.modal.querySelector('button.close').innerHTML = "Fenster schliessen";
+                break;
+        }
     }
 
     loadService (obj, serviceUrl)

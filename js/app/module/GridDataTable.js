@@ -1,23 +1,34 @@
 /**
+ *-------------------------------------------
+ * GridDataTable.js
+ *-------------------------------------------
+ * @version 1.0
+ * @createAt 17.06.2020 17:30
+ * @updatedAt 01.03.2022 14:52
+ * @author NetCoDev
+ *-------------------------------------------
+ **/
+
+/**
  * ------------------------------------
  * DataTableUtile
  * ------------------------------------
  */
-class DataTableUtile 
+class DataTableUtile
 {
     static getStrNumber (i, str)
     {
         let res = "";
         let nextChar = null;
         let doIt = true;
-        while (doIt) { 
-            res += "" + str[i]; 
+        while (doIt) {
+            res += "" + str[i];
             if (i +1 < str.length && /^[\d]$/.test(str[i+1])) {
-                    i++; 
-            } else { 
+                i++;
+            } else {
                 if (i +1 < str.length) { nextChar = str[i+1]; }
-                doIt = false; 
-            } 
+                doIt = false;
+            }
         }
 
         return {res:res, nextChar:nextChar};
@@ -34,9 +45,11 @@ class DataTableUtile
     {
         let res = arr;
         res.sort(function (a,b) { return DataTableUtile.getSortRes(a[1], b[1], orderAsc) });
-        
-        return res.sort(function (a,b) { 
-            if (/^[\d]{2}\.[\d]{2}\.[\d]{4}$/.test(a[1]) && /^[\d]{2}\.[\d]{2}\.[\d]{4}$/.test(b[1])) {
+
+        return res.sort(function (a,b) {
+            if (/^[\d]{2}\.[\d]{2}\.[\d]{4}$/.test(a[1]) && /^[\d]{2}\.[\d]{2}\.[\d]{4}$/.test(b[1])
+                //|| /^\d{2}[./-]\d{2}[./-]\d{4}[\s]\d{2}[:]\d{2}$/.test(a[1]) && /^\d{2}[./-]\d{2}[./-]\d{4}[\s]\d{2}[:]\d{2}$/.test(b[1])
+            ) {
                 return DataTableUtile.sortDate(a[1], b[1], orderAsc, config.dateLang);
             } else {
                 return DataTableUtile.sortString(a,b,orderAsc);
@@ -51,8 +64,8 @@ class DataTableUtile
 
         return res;
     }
-    
-    static sortDate (a, b, orderAsc, dateLang) 
+
+    static sortDate (a, b, orderAsc, dateLang)
     {
         const dateA = DataTableUtile.getLangDate(a, dateLang);
         const dateB = DataTableUtile.getLangDate(b, dateLang);
@@ -64,24 +77,28 @@ class DataTableUtile
     {
         let intVal = obj.inpt.value.trim();
         let res = null;
-        
+
         if (/^[\d]+$/.test(intVal) && intVal) {
             if (obj.max < intVal*1) {
                 intVal = obj.max;
                 obj.inpt.value = intVal;
-             }
+            }
             res = intVal*1;
         } else {
             obj.inpt.value = obj.default;
         }
-        
+
         return res;
     }
 
-    static sortString (a, b, orderAsc) 
+    static sortString (a, b, orderAsc)
     {
-        const arr0 = (a[1]) ? a[1].toLowerCase().match(/[^\W*]/g) : "";
-        const arr1 = (b[1]) ? b[1].toLowerCase().match(/[^\W*]/g) : "";
+        const arr0 = (a[1] && /^[\d*]$/.test(a[1]))
+            ? a[1]
+            : ((/^[\W*]$/i.test(a[1]) ) ? a[1].toLowerCase() : "");
+        const arr1 = (b[1] && /^[\d*]$/.test(b[1]))
+            ? b[1]
+            : (( /^[\W*]$/i.test(b[1])) ? b[1].toLowerCase() : "");
         let res0 = "";
         let res1 = "";
 
@@ -103,17 +120,17 @@ class DataTableUtile
                 }
                 return DataTableUtile.getSortRes(n0, n1, orderAsc);
             }
-            if (arr1.length <= i && res0 === res1 || arr0[i] != arr1[i] && /^[\d]$/.test(arr1[i])) { 
+            if (arr1.length <= i && res0 === res1 || arr0[i] != arr1[i] && /^[\d]$/.test(arr1[i])) {
                 return (!orderAsc) ? 1 > 0 :1 < 0;
-            } else { 
-                res0 = arr0[i]; 
-                res1 = arr1[i]; 
-                if (arr0[i] != arr1[i]) { 
+            } else {
+                res0 = arr0[i];
+                res1 = arr1[i];
+                if (arr0[i] != arr1[i]) {
                     return DataTableUtile.getSortRes(arr0[i], arr1[i], orderAsc);
                 }
             }
         }
-        
+
         return DataTableUtile.getSortRes(res1, res0, orderAsc);
     }
 }
@@ -147,43 +164,33 @@ class DataTableConf
             arrRowIndex    : [],
             arrColType     : {},
             objSortList    : {},
+            regEx          : {"date" : /^\d{2}[./-]\d{2}[./-]\d{4}$/, "dateTime" : /^\d{2}[./-]\d{2}[./-]\d{4}[\s]\d{2}[:]\d{2}$/},
             urlGetParam    : [],
             urlPostParam   : null,
             urlSearchParam : null,
             searchDate     : {start : [], end : [], show : false},
             dom            : {container : null},
             domId          : {
-                btnNext : 'btn-step-forward', 
-                btnBack : 'btn-step-back', 
-                btnStep : 'btn-step', 
-                btnSearch     : 'btn-search', 
+                btnNext : 'btn-step-forward',
+                btnBack : 'btn-step-back',
+                btnStep : 'btn-step',
+                btnSearch     : 'btn-search',
                 btnShowList   : 'btn-show-list',
                 btnShowSelct  : 'btn-show-selection',
                 btnRstSelct   : 'btn-reset-selection',
                 btnRstGlblSrch   : 'btn-reset-global-search',
                 btnContLen    : 'btn-content-length',
                 btnConlToggle : 'btn-col-toggle',
-                contentInfo   : 'dataTable-content-info', 
-                maxStep       : 'dataTable-max-step', 
-                colToggleList : 'dataTable-toggle-list-column', 
-                colSearchList : 'dataTable-toggle-list-search', 
+                contentInfo   : 'dataTable-content-info',
+                maxStep       : 'dataTable-max-step',
+                colToggleList : 'dataTable-toggle-list-column',
+                colSearchList : 'dataTable-toggle-list-search',
                 inptContentLength : 'inpt-content-length',
-                inptStep : 'inpt-step', 
-                wrapper : 'dataTable-wrapper', 
-                header : 'dataTable-header', 
+                inptStep : 'inpt-step',
+                wrapper : 'dataTable-wrapper',
+                header : 'dataTable-header',
                 content : 'dataTable-content',
                 colToggleWrapper : 'dataTable-col-toggle-wrapper'
-            },
-            tpl : {
-                "columnHeader" : '<div class="col-header-wrapper"><div class="col-header-label">{%column%}</div><div class="order-box-container"><span class="svg-arrow-item" data-arrow-id="up"><svg class="svg-arrow" viewBox="0 0 640 640" width="10" height="10"><defs><path d="M160.01 320.01L0.02 640.02L320.03 640.01L640.02 640L480.03 320L320.01 0.01L160.01 320.01Z" id="bbbJpxd7D"></path></defs><g><g><g><use xlink:href="#bbbJpxd7D" opacity="1" fill="#30bf2d" fill-opacity="1"></use><g><use xlink:href="#bbbJpxd7D" opacity="1" fill-opacity="0" stroke="#42413f" stroke-width="1" stroke-opacity="1"></use></g></g></g></g></svg></span><span class="svg-arrow-item" data-arrow-id="down"><svg class="svg-arrow" viewBox="0 0 640 640" width="10" height="10"><defs><path d="M480.02 320L640 0L320 0.01L0 0.02L160 320.01L320.01 640.01L480.02 320Z" id="a4wj2R4nkY"></path></defs><g><g><g><use xlink:href="#a4wj2R4nkY" opacity="1" fill="#30bf2d" fill-opacity="1"></use><g><use xlink:href="#a4wj2R4nkY" opacity="1" fill-opacity="0" stroke="#42413f" stroke-width="1" stroke-opacity="1"></use></g></g></g></g></svg></span></div></div>',
-                "columnToggleList" : '<span>{%column%}</span><input type="radio" checked="checked"/>',
-                "searchToggleList" : '<span>{%column%}</span>',
-                "rowIndex" : '<span class="rowIndex">{%rowIndex%}</span>',
-                "app" : [
-                    '<div class="dataTable-toolbar"><button class="btn-show-list btn-blue">{%show_list%}</button><button class="btn-show-selection btn-blue">{%show_selection%}</button><button class="btn-reset-selection btn-blue">{%show_reset%}</button><button class="btn-reset-global-search btn-blue hide">{%reset-global-search%}</button><div class="dataTable-col-toggle-wrapper"><button class="btn-col-toggle btn-blue">{%in_column%} <span class="column-name"></span> {%search%}</button><div class="dataTable-col-toggle-list toggle-top dataTable-toggle-list-search"></div></div><div class="dataTable-search-wrapper-str"><input class="inpt-search" type="text" data-col-index=""><input name="global-search-text" type="checkbox"><span class="txt-global"> : global</span><div class="btn-search btn-blue"><svg fill="#000000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="20px" height="20px"><path d="M 21 3 C 11.601563 3 4 10.601563 4 20 C 4 29.398438 11.601563 37 21 37 C 24.355469 37 27.460938 36.015625 30.09375 34.34375 L 42.375 46.625 L 46.625 42.375 L 34.5 30.28125 C 36.679688 27.421875 38 23.878906 38 20 C 38 10.601563 30.398438 3 21 3 Z M 21 7 C 28.199219 7 34 12.800781 34 20 C 34 27.199219 28.199219 33 21 33 C 13.800781 33 8 27.199219 8 20 C 8 12.800781 13.800781 7 21 7 Z"/></svg></div></div><div class="dataTable-search-wrapper-date"><input class="inpt-date datepicker" name="date-from" type="text" data-col-index=""><span>-</span><input class="inpt-date datepicker" name="date-to" type="text"><input name="global-search-text" type="checkbox"><span class="txt-global"> : global</span><div class="btn-search btn-blue"><svg fill="#000000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="20px" height="20px"><path d="M 21 3 C 11.601563 3 4 10.601563 4 20 C 4 29.398438 11.601563 37 21 37 C 24.355469 37 27.460938 36.015625 30.09375 34.34375 L 42.375 46.625 L 46.625 42.375 L 34.5 30.28125 C 36.679688 27.421875 38 23.878906 38 20 C 38 10.601563 30.398438 3 21 3 Z M 21 7 C 28.199219 7 34 12.800781 34 20 C 34 27.199219 28.199219 33 21 33 C 13.800781 33 8 27.199219 8 20 C 8 12.800781 13.800781 7 21 7 Z"/></svg></div></div></div></div>',
-                    '<div class="dataTable-wrapper"><table class="dataTable-table"><thead class="dataTable-header"></thead><tbody class="dataTable-content"></tbody></table></div>',
-                    '<div class="dataTable-toolbar"><button class="btn-step-back btn-green"><div class="svg-wrapper"><svg version="1.1" viewBox="0 0 640 640" width="20" height="20"><defs><path d="M320.02 480.01L640.02 640L640.01 319.99L640 0L320.01 159.99L0.01 320.01L320.02 480.01Z" id="dByRCX4Jj"></path></defs><g><g><g><use xlink:href="#dByRCX4Jj" opacity="1" fill="#96938e" fill-opacity="1"></use><g><use xlink:href="#dByRCX4Jj" opacity="1" fill-opacity="0" stroke="#42413f" stroke-width="1" stroke-opacity="1"></use></g></g></g></g></svg></div></button><div class="dataTable-content-info"></div><button class="btn-step-forward btn-green"><div class="svg-wrapper"><svg version="1.1" viewBox="0 0 640 640" width="20" height="20"><defs><path d="M320.01 160L0 0.02L0.01 320.02L0.02 640.02L320.02 480.02L640.01 320.01L320.01 160Z" id="bIbcTwxec"></path></defs><g><g><g><use xlink:href="#bIbcTwxec" opacity="1" fill="#96938e" fill-opacity="1"></use><g><use xlink:href="#bIbcTwxec" opacity="1" fill-opacity="0" stroke="#42413f" stroke-width="1" stroke-opacity="1"></use></g></g></g></g></svg></div></button><input type="text" class="inpt-content-length"><button class="btn-content-length btn-green">{%results_per_page%}</button><input type="text" class="inpt-step" value="1"><button class="btn-step btn-green"> / <span class="dataTable-max-step">1</span> {%page%}</button><div class="dataTable-col-toggle-wrapper"><button class="btn-col-toggle btn-green">{%column_hide_show%}</button><div class="dataTable-col-toggle-list toggle-bottom dataTable-toggle-list-column"></div></div></div>'
-                ]
             },
             lang : {
                 "de" : {
@@ -209,6 +216,22 @@ class DataTableConf
                     "reset-global-search" : "Deselect Globalsearch",
                 }
             }
+        };
+        defaultConf.searchInput = {
+            "text" : '<input class="inpt-search" type="text" data-col-index="" data-col-column="">',
+            "date" : '<div class="input-wrapper"><input class="inpt-date date-picker" name="date-from" type="text" data-col-index="" data-col-column=""></div><span>-</span><div class="input-wrapper"><input class="inpt-date date-picker" name="date-to" type="text"></div>',
+        };
+
+        defaultConf.tpl = {
+            "columnHeader" : '<div class="col-header-wrapper"><div class="col-header-label">{%column%}</div><div class="order-box-container"><span class="svg-arrow-item" data-arrow-id="up"><svg class="svg-arrow" viewBox="0 0 640 640" width="10" height="10"><defs><path d="M160.01 320.01L0.02 640.02L320.03 640.01L640.02 640L480.03 320L320.01 0.01L160.01 320.01Z" id="bbbJpxd7D"></path></defs><g><g><g><use xlink:href="#bbbJpxd7D" opacity="1" fill="#30bf2d" fill-opacity="1"></use><g><use xlink:href="#bbbJpxd7D" opacity="1" fill-opacity="0" stroke="#42413f" stroke-width="1" stroke-opacity="1"></use></g></g></g></g></svg></span><span class="svg-arrow-item" data-arrow-id="down"><svg class="svg-arrow" viewBox="0 0 640 640" width="10" height="10"><defs><path d="M480.02 320L640 0L320 0.01L0 0.02L160 320.01L320.01 640.01L480.02 320Z" id="a4wj2R4nkY"></path></defs><g><g><g><use xlink:href="#a4wj2R4nkY" opacity="1" fill="#30bf2d" fill-opacity="1"></use><g><use xlink:href="#a4wj2R4nkY" opacity="1" fill-opacity="0" stroke="#42413f" stroke-width="1" stroke-opacity="1"></use></g></g></g></g></svg></span></div></div>',
+            "columnToggleList" : '<span>{%column%}</span><input type="radio" checked="checked"/>',
+            "searchToggleList" : '<span>{%column%}</span>',
+            "rowIndex" : '<span class="rowIndex">{%rowIndex%}</span>',
+            "app" : [
+                '<div class="dataTable-toolbar"><button class="btn-show-list btn-blue">{%show_list%}</button><button class="btn-show-selection btn-blue">{%show_selection%}</button><button class="btn-reset-selection btn-blue">{%show_reset%}</button><button class="btn-reset-global-search btn-blue hide">{%reset-global-search%}</button><div class="dataTable-col-toggle-wrapper"><button class="btn-col-toggle btn-blue">{%in_column%} <span class="column-name"></span> {%search%}</button><div class="dataTable-col-toggle-list toggle-top dataTable-toggle-list-search"></div></div><div class="dataTable-search-wrapper-str">' + defaultConf.searchInput.text +'<input name="global-search-text" type="checkbox"><span class="txt-global"> : global</span><div class="btn-search btn-blue"><svg fill="#000000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="20px" height="20px"><path d="M 21 3 C 11.601563 3 4 10.601563 4 20 C 4 29.398438 11.601563 37 21 37 C 24.355469 37 27.460938 36.015625 30.09375 34.34375 L 42.375 46.625 L 46.625 42.375 L 34.5 30.28125 C 36.679688 27.421875 38 23.878906 38 20 C 38 10.601563 30.398438 3 21 3 Z M 21 7 C 28.199219 7 34 12.800781 34 20 C 34 27.199219 28.199219 33 21 33 C 13.800781 33 8 27.199219 8 20 C 8 12.800781 13.800781 7 21 7 Z"/></svg></div></div><div class="dataTable-search-wrapper-date">' + defaultConf.searchInput.date + '<input name="global-search-text" type="checkbox"><span class="txt-global"> : global</span><div class="btn-search btn-blue"><svg fill="#000000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="20px" height="20px"><path d="M 21 3 C 11.601563 3 4 10.601563 4 20 C 4 29.398438 11.601563 37 21 37 C 24.355469 37 27.460938 36.015625 30.09375 34.34375 L 42.375 46.625 L 46.625 42.375 L 34.5 30.28125 C 36.679688 27.421875 38 23.878906 38 20 C 38 10.601563 30.398438 3 21 3 Z M 21 7 C 28.199219 7 34 12.800781 34 20 C 34 27.199219 28.199219 33 21 33 C 13.800781 33 8 27.199219 8 20 C 8 12.800781 13.800781 7 21 7 Z"/></svg></div></div></div></div>',
+                '<div class="dataTable-wrapper"><table class="dataTable-table"><thead class="dataTable-header"></thead><tbody class="dataTable-content"></tbody></table></div>',
+                '<div class="dataTable-toolbar"><button class="btn-step-back btn-green"><div class="svg-wrapper"><svg version="1.1" viewBox="0 0 640 640" width="20" height="20"><defs><path d="M320.02 480.01L640.02 640L640.01 319.99L640 0L320.01 159.99L0.01 320.01L320.02 480.01Z" id="dByRCX4Jj"></path></defs><g><g><g><use xlink:href="#dByRCX4Jj" opacity="1" fill="#96938e" fill-opacity="1"></use><g><use xlink:href="#dByRCX4Jj" opacity="1" fill-opacity="0" stroke="#42413f" stroke-width="1" stroke-opacity="1"></use></g></g></g></g></svg></div></button><div class="dataTable-content-info"></div><button class="btn-step-forward btn-green"><div class="svg-wrapper"><svg version="1.1" viewBox="0 0 640 640" width="20" height="20"><defs><path d="M320.01 160L0 0.02L0.01 320.02L0.02 640.02L320.02 480.02L640.01 320.01L320.01 160Z" id="bIbcTwxec"></path></defs><g><g><g><use xlink:href="#bIbcTwxec" opacity="1" fill="#96938e" fill-opacity="1"></use><g><use xlink:href="#bIbcTwxec" opacity="1" fill-opacity="0" stroke="#42413f" stroke-width="1" stroke-opacity="1"></use></g></g></g></g></svg></div></button><input type="text" class="inpt-content-length"><button class="btn-content-length btn-green">{%results_per_page%}</button><input type="text" class="inpt-step" value="1"><button class="btn-step btn-green"> / <span class="dataTable-max-step">1</span> {%page%}</button><div class="dataTable-col-toggle-wrapper"><button class="btn-col-toggle btn-green">{%column_hide_show%}</button><div class="dataTable-col-toggle-list toggle-bottom dataTable-toggle-list-column"></div></div></div>'
+            ]
         };
 
         return Object.assign(defaultConf,config);
@@ -240,7 +263,7 @@ class DataTableSearch
             let colVal2 = list[revertIndex].querySelectorAll('.data-col')[srchConf.index].innerHTML.toLowerCase();
 
             if (srchConf.type === 'date' && srchConf.hasOwnProperty('dateEnd')) {
-                
+
                 let sDate = DataTableUtile.getLangDate(srchConf.val, this.config.dateLang);
                 let eDate = DataTableUtile.getLangDate(srchConf.dateEnd, this.config.dateLang);
                 colVal1 = DataTableUtile.getLangDate(colVal1, this.config.dateLang);
@@ -267,7 +290,7 @@ class DataTableSearch
                     revertIndex--;
                 }
             }
-            
+
             if (revertIndex === i) { break; }
         }
 
@@ -280,13 +303,13 @@ class DataTableSearch
         let arrIndex = [];
         let arrRowIndex = [];
         const asc = (order === 'down') ? 1 : 0;
-        
+
         for (let i = 0; i < this.config.dataTable.length; i++) {
             let rowId = this.config.content.getElementsByClassName("data-row")[i].dataset.rowIndex*1;
             arrIndex.push([rowId, this.config.dataTable[rowId][colIndex]]);
         }
         arrIndex = DataTableUtile.getSort(arrIndex,asc, this.config);
-        
+
         for (let n = 0; n < arrIndex.length; n++) {
             arrRes.push(this.config.dataTable[arrIndex[n][0]*1]);
             arrRowIndex.push(arrIndex[n][0]*1);
@@ -294,7 +317,7 @@ class DataTableSearch
 
         return {arrRes:arrRes, arrRowIndex:arrRowIndex};
     };
-        
+
     set _config (obj) { this.config = Object.assign(this.config,obj); }
 }
 
@@ -343,7 +366,7 @@ class DataTableEvent
     {
         const radio = obj.getElementsByTagName("input")[0];
         const status = !!(radio.getAttribute('checked'));
-        
+
         if (!status) {
             radio.setAttribute('checked','checked');
             this.config.arrToggleList.splice(this.config.arrToggleList.indexOf(obj.dataset.colIndex), 1);
@@ -354,7 +377,7 @@ class DataTableEvent
         this.DataTable.View.setColumnUpdate(obj.dataset.colIndex, status);
     }
 
-    searchToggleEvent (obj, val, index)
+    searchToggleEvent (obj, val, index, column)
     {
         const parent = this.DataTable.View.getClosest('dataTable-col-toggle-wrapper',obj);
         const container = this.DataTable.View.getClosest('dataTable-toolbar',parent);
@@ -366,30 +389,39 @@ class DataTableEvent
         if (!this.config.arrColType.hasOwnProperty("col_" +index)) {
             this.config.arrColType["col_" +index] = this.DataTable.View.getColumnType(index);
         }
-        
+
+        this.toggleSearchWrapper (strSearchWrapper, dateSearchWrapper, this.config.arrColType["col_" +index]);
+
         if (this.config.arrColType["col_" +index] === "string") {
+            strSearchWrapper.getElementsByClassName("inpt-search")[0].dataset.colIndex = index;
+            strSearchWrapper.getElementsByClassName("inpt-search")[0].dataset.colColumn = column;
+            strSearchWrapper.getElementsByClassName("inpt-search")[0].value = "";
+            strSearchWrapper.getElementsByClassName("inpt-search")[0].focus();
+        } else {
+            dateSearchWrapper.getElementsByClassName("inpt-date")[0].dataset.colIndex = index;
+            dateSearchWrapper.getElementsByClassName("inpt-date")[0].dataset.colColumn = column;
+            dateSearchWrapper.getElementsByClassName("inpt-date")[0].value = "";
+            dateSearchWrapper.getElementsByClassName("inpt-date")[1].value = "";
+            dateSearchWrapper.getElementsByClassName("inpt-date")[0].focus();
+        }
+    }
+
+    toggleSearchWrapper (strSearchWrapper, dateSearchWrapper, colType = "string")
+    {
+        if (colType === "string") {
             if (!strSearchWrapper.classList.contains('active')) {
                 strSearchWrapper.classList.add('active');
             }
             if (dateSearchWrapper.classList.contains('active')) {
                 dateSearchWrapper.classList.remove('active');
             }
-            strSearchWrapper.getElementsByClassName("inpt-search")[0].dataset.colIndex = index;
-            strSearchWrapper.getElementsByClassName("inpt-search")[0].value = "";
-            strSearchWrapper.getElementsByClassName("inpt-search")[0].focus();
         } else {
-            
             if (strSearchWrapper.classList.contains('active')) {
                 strSearchWrapper.classList.remove('active');
             }
             if (!dateSearchWrapper.classList.contains('active')) {
                 dateSearchWrapper.classList.add('active');
             }
-
-            dateSearchWrapper.getElementsByClassName("inpt-date")[0].dataset.colIndex = index;
-            dateSearchWrapper.getElementsByClassName("inpt-date")[0].value = "";
-            dateSearchWrapper.getElementsByClassName("inpt-date")[1].value = "";
-            dateSearchWrapper.getElementsByClassName("inpt-date")[0].focus();
         }
     }
 }
@@ -411,36 +443,51 @@ class DataTableView
         const tr = document.createElement("tr");
         const stickyBox = document.createElement("th");
         stickyBox.classList.add('th-sticky');
-        stickyBox.appendChild(document.createTextNode("Nr.:"));
+        // stickyBox.appendChild(document.createTextNode("Nr.:"));
+        stickyBox.appendChild(document.createTextNode("Aktion"));
         tr.appendChild(stickyBox);
-        arrData.map((colVal) => { 
-            this.setColumn(tr, colVal, "col-header"); 
-            this.setColumnToggleList(this.config.dom.colToggleList, colVal);
-            this.setSearchToggleList(this.config.dom.colSearchList, colVal);
-            this.config.dataIndex++; 
-        });
+        this.config.dom.colToggleList.innerHTML = "";
+        this.config.dom.colSearchList.innerHTML = "";
+        // Map Array or Object entries
+        if (arrData.hasOwnProperty('length')) {
+            arrData.map((colVal) => {this.setHeaderColumn(tr, colVal)});
+        } else {
+            for (const [key, value] of Object.entries(arrData)) {this.setHeaderColumn(tr, `${value}`, `${key}`)}
+        }
         this.config.dom.header.innerHTML = "";
         this.config.dom.header.appendChild(tr);
         this.config.dataIndex = 0;
+    }
+
+    setHeaderColumn (tr, colVal, colKey= "")
+    {
+        const objVal = (!colKey) ? [colVal,colVal] : [colKey,colVal];
+        const listColKey = (!colKey) ? colVal : colKey;
+        this.setColumn(tr, objVal, "col-header", colKey);
+        this.setColumnToggleList(this.config.dom.colToggleList, colVal, listColKey);
+        this.setSearchToggleList(this.config.dom.colSearchList, colVal, listColKey);
+        this.config.dataIndex++;
     }
 
     setContent (val)
     {
         let colIndex = 0;
         let rowIndex = (this.config.dataConfig.stepLen >= this.config.dataConfig.actualLen)
-            ? this.config.dataIndex + 1 
+            ? this.config.dataIndex + 1
             : (this.config.dataConfig.actualLen - this.config.dataConfig.rowLen) + (this.config.dataIndex + 1);
-        
+
         const tr = document.createElement("tr");
         const stickyBox = document.createElement("td");
-        stickyBox.innerHTML = this.config.tpl.rowIndex.replace('{%rowIndex%}', rowIndex);
+        const actionTpl = '<span class="action edit">bearbeiten</span> | <span class="action delete">löschen</span>'
+        //stickyBox.innerHTML = this.config.tpl.rowIndex.replace('{%rowIndex%}', rowIndex);
+        stickyBox.innerHTML = this.config.tpl.rowIndex.replace('{%rowIndex%}', actionTpl);
         stickyBox.classList.add('td-sticky');
         tr.className = "data-row";
         tr.setAttribute(tr.className + '-index', (this.config.arrRowIndex.length) ? this.config.arrRowIndex[this.config.dataIndex] : this.config.dataIndex);
         tr.appendChild(stickyBox);
         val.map((colVal) => {  this.setColumn(tr, colVal, "data-col", colIndex++);  });
-        this.config.dom.content.appendChild(tr); 
-        this.config.dataIndex++; 
+        this.config.dom.content.appendChild(tr);
+        this.config.dataIndex++;
     }
 
     setColumn (parent, val, css, colIndex = -1)
@@ -448,16 +495,16 @@ class DataTableView
         const col = (css === 'col-header') ? document.createElement("th") : document.createElement("td");
 
         if (css === 'col-header') {
-            col.innerHTML = this.config.tpl.columnHeader.replace("{%column%}", val);
+            col.innerHTML = this.config.tpl.columnHeader.replace("{%column%}", val[1]);
         } else {
             col.appendChild(document.createTextNode(val));
         }
-        
+
         if (css) {
             col.className = css;
             if (css === 'col-header') {
                 col.setAttribute('data-col-index', this.config.dataIndex);
-                
+                col.setAttribute('data-col-column', val[0]);
             }
             if (css === 'data-col') {
                 col.setAttribute('data-col-index', colIndex);
@@ -465,8 +512,8 @@ class DataTableView
                     col.style.display = "none";
                 }
             }
-        }       
-        parent.appendChild(col);  
+        }
+        parent.appendChild(col);
     }
 
     setColumnUpdate (colIndex, hide)
@@ -487,20 +534,21 @@ class DataTableView
         const col = document.createElement("div");
         col.setAttribute('data-col-index', this.config.dataIndex);
         col.className = 'col-toggle-list';
-        col.innerHTML = this.config.tpl.columnToggleList.replace("{%column%}", val);      
-        parent.appendChild(col); 
+        col.innerHTML = this.config.tpl.columnToggleList.replace("{%column%}", val);
+        parent.appendChild(col);
         col.onclick = () => {this.Event.colToggleEvent(col);}
     }
-    
-    setSearchToggleList (parent, val) 
+
+    setSearchToggleList (parent, val, listColKey)
     {
         const col = document.createElement("div");
         const index = this.config.dataIndex;
-        col.setAttribute('data-col-index', index);
+        //col.setAttribute('data-col-index', index);
+        col.setAttribute('data-col-column', listColKey);
         col.className = 'col-toggle-list';
-        col.innerHTML = this.config.tpl.searchToggleList.replace("{%column%}", val);      
-        parent.appendChild(col); 
-        col.onclick = () => { this.Event.searchToggleEvent(col, val, index); };
+        col.innerHTML = this.config.tpl.searchToggleList.replace("{%column%}", val);
+        parent.appendChild(col);
+        col.onclick = () => { this.Event.searchToggleEvent(col, val, index, listColKey); };
     }
 
     setAppTpl ()
@@ -519,11 +567,11 @@ class DataTableView
     {
         let res = {date:0, str:0};
 
-        this.config.dom.content.querySelectorAll('.data-row').forEach( (row) => 
-        { 
+        this.config.dom.content.querySelectorAll('.data-row').forEach( (row) =>
+        {
             const colVal = row.getElementsByClassName("data-col")[colIndex].innerHTML.trim();
 
-            if (/^[\d]{2}\.[\d]{2}\.[\d]{4}$/.test(colVal)) {
+            if (this.config.regEx["date"].test(colVal) || this.config.regEx["dateTime"].test(colVal)) {
                 res.date++;
             } else {
                 res.str++;
@@ -560,7 +608,7 @@ class DataTableView
                 });
             } else {
                 this.config.arrRowList.push(obj.dataset.rowIndex);
-            } 
+            }
             obj.classList.toggle('active');
         } else {
             if (obj.classList.contains('active')) {
@@ -621,9 +669,9 @@ class DataTableToolBar
                 max  : this.config.dataConfig.maxStep,
                 default : this.config.dataConfig.dataStep
             });
-            if (intVal !== null) { 
+            if (intVal !== null) {
                 this.config.dataConfig.dataStep = intVal;
-                this.setStep(intVal, 0); 
+                this.setStep(intVal, 0);
             }
         };
         // Button entries per page event
@@ -655,17 +703,19 @@ class DataTableToolBar
     setSearch (btn)
     {
         const container = btn.parentElement;
-        const srchConf = {val:null, index:null, type:''};
+        const srchConf = {val:null, type:'', column:''};
         const checkGlobal = container.querySelectorAll('input[name="global-search-text"]')[0];
         // Set searchSpace to list (search in list) or global (search gloobal)
         const searchSpace = (checkGlobal.checked) ? "global" : "list";
 
         if (container.classList.contains('dataTable-search-wrapper-str')) {
             srchConf.val = container.getElementsByClassName('inpt-search')[0].value.trim();
+            srchConf.column = container.getElementsByClassName('inpt-search')[0].dataset.colColumn;;
             srchConf.index = container.getElementsByClassName('inpt-search')[0].dataset.colIndex;
             srchConf.type = 'string';
         } else {
             srchConf.val = container.getElementsByClassName('inpt-date')[0].value.trim();
+            srchConf.column = container.getElementsByClassName('inpt-date')[0].dataset.colColumn;
             srchConf.index = container.getElementsByClassName('inpt-date')[0].dataset.colIndex;
             srchConf.type = 'date';
 
@@ -693,8 +743,8 @@ class DataTableToolBar
     setStep (next, isOneStep = 1)
     {
         if (!isOneStep
-                || next && this.config.dataConfig.dataStep+1 <= this.config.dataConfig.maxStep
-                || !next && this.config.dataConfig.dataStep-1 > 0) {
+            || next && this.config.dataConfig.dataStep+1 <= this.config.dataConfig.maxStep
+            || !next && this.config.dataConfig.dataStep-1 > 0) {
             this.config.dataConfig.dataStep = (next)
                 ? ((isOneStep) ? this.config.dataConfig.dataStep+1 : next)
                 : this.config.dataConfig.dataStep-1;
@@ -705,13 +755,15 @@ class DataTableToolBar
             if (isOneStep){
                 this.config.dom.inptStep.value = this.config.dataConfig.dataStep;
             }
-            this.DataTable.setRequest(filter); 
+            this.DataTable.setRequest(filter);
         }
     }
 
     setToolbarInfo ()
     {
-        this.config.dom.contentInfo.innerHTML = this.config.dataConfig.actualLen + " / " + this.config.dataConfig.maxLen;
+        this.config.dom.contentInfo.innerHTML = (this.config.dataConfig.actualLen <= this.config.dataConfig.maxLen)
+            ? this.config.dataConfig.actualLen + " / " + this.config.dataConfig.maxLen
+            : this.config.dataConfig.maxLen + " / " + this.config.dataConfig.maxLen;
         this.config.dom.inptContentLength.value = this.config.dataConfig.stepLen;
         this.config.dom.maxStep.innerHTML = this.config.dataConfig.maxStep;
         this.config.dom.inptStep.value = this.config.dataConfig.dataStep;
@@ -732,7 +784,7 @@ class DataTableToolBar
  */
 class DataTable
 {
-    constructor(container, config) 
+    constructor(container, config)
     {
         // Set config
         this.config = DataTableConf.getConf(config);
@@ -742,7 +794,7 @@ class DataTable
         this.Event   = new DataTableEvent(this);
         this.View    = new DataTableView(this);
         this.Toolbar = new DataTableToolBar(this);
-        // Render appp
+        // Render app
         this.setApp();
         // Set data request
         this.setRequest();
@@ -770,40 +822,72 @@ class DataTable
 
     setRequest (postParam = null)
     {
-        const xhttp = new XMLHttpRequest();
-        const _this = this;
-        // Create object with Form parameter
-        // Add Search Param if exists
         let formData = (this.config.urlSearchParam !== null) ? {...this.config.urlSearchParam} : {};
-        // Add postParam  if not empty
         if (postParam !== null) { formData = {...formData, ...postParam}; }
-        // Scroll data table view to top
         this.config.dom.wrapper.scrollTop = 0;
 
-        // Send ajax request
-        xhttp.open("POST", this.config.ajaxUrl, true);
-        xhttp.send(GridUi.formData(formData));
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                const responseData = JSON.parse(this.responseText);
-                if (responseData.status === "success"){ _this.setDataTable(responseData.dataTable); }
+        GridAjax.postRequest({
+            url: this.config.ajaxUrl,
+            formData: GridUi.formData(formData),
+            component: this,
+            response: 'setResponse'
+        });
+        // const xhttp = new XMLHttpRequest();
+        // const _this = this;
+        // // Create object with Form parameter
+        // // Add Search Param if exists
+        // let formData = (this.config.urlSearchParam !== null) ? {...this.config.urlSearchParam} : {};
+        // // Add postParam  if not empty
+        // if (postParam !== null) { formData = {...formData, ...postParam}; }
+        // // Scroll data table view to top
+        // this.config.dom.wrapper.scrollTop = 0;
+        //
+        // // Send ajax request
+        // xhttp.open("POST", this.config.ajaxUrl, true);
+        // xhttp.send(GridUi.formData(formData));
+        // xhttp.onreadystatechange = function() {
+        //     if (this.readyState == 4 && this.status == 200) {
+        //         const responseData = JSON.parse(this.responseText);
+        //         if (responseData.status === "success"){
+        //             _this.config.dom.container.style.display = 'block';
+        //             _this.setDataTable(responseData.dataTable);
+        //         } else {
+        //             if (responseData?.dataTable && responseData.dataTable.length < 1) {
+        //                 _this.config.dom.container.style.display = 'none';
+        //             }
+        //         }
+        //     }
+        // };
+    }
+
+    setResponse (data)
+    {
+        if (data.status === "success"){
+            this.config.dom.container.style.display = 'block';
+            this.setDataTable(data.dataTable);
+        } else {
+            if (data?.dataTable && data.dataTable.length < 1) {
+                this.config.dom.container.style.display = 'none';
             }
-        };
+        }
     }
 
     setDataTable (dataTable)
     {
+        const headerLength = (!dataTable.hasOwnProperty('header'))
+            ? 0
+            : ((dataTable.header.hasOwnProperty('length')) ? dataTable.header.length : Object.keys(dataTable.header).length);
         this.config.dataIndex = 0;
-        
-        if (dataTable.hasOwnProperty('header') && dataTable.header.length) {
-            this.View.setHeader(dataTable.header); 
+
+        if (headerLength) {
+            this.View.setHeader(dataTable.header);
             this.Event.headerEvent();
             this.Toolbar.setToolbarEvent();
         } else {
             if (this.config.dom.header.querySelectorAll('.svg-arrow-item.active').length) {
                 this.config.dom.header.querySelectorAll('.svg-arrow-item.active')[0].setAttribute('class', 'svg-arrow-item');
             }
-        } 
+        }
         this.setDataConfig(dataTable);
         this.setDataTableContent(dataTable.content);
         this.Toolbar.setToolbarInfo();
@@ -819,6 +903,7 @@ class DataTable
         dataTable.map((val) => this.View.setContent(val));
         this.Search._config = {content : this.config.dom.content};
         this.Event.contentEvent();
+        this.config.modalAction();
     }
 
     setDataTableCache (reset = false)
@@ -843,13 +928,13 @@ class DataTable
         }
     }
 
-    setSortDataTable (index, obj) 
+    setSortDataTable (index, obj)
     {
         this.config.objSortList = {};
         this.config.objSortList['sortId_' + index] = obj.dataset.arrowId;
         this.Search._config = {content : this.config.dom.content};
         const dataTable = this.Search.getSort(index, obj.dataset.arrowId);
-        
+
         this.config.arrRowIndex = dataTable.arrRowIndex;
 
         if (this.config.dom.header.querySelectorAll('.svg-arrow-item.active').length) {
@@ -866,7 +951,7 @@ class DataTable
             this.Search._config = {content : this.config.dom.content};
             const dataTable = [];
             const searchRes = this.Search.getSearch(srchConf);
-            
+
             if (searchRes.length) {
                 searchRes.map((val) => { dataTable.push(this.config.dataTable[val*1]); });
                 this.config.arrRowList = [];
@@ -897,37 +982,5 @@ class DataTable
         this.config.dataTable = dataTable.content;
         this.config.objSortList = {};
         this.config.arrRowIndex = [];
-    }
-}
-
-class GridDataTable extends GridComponent
-{
-    constructor (obj, nameSpace, callerInput) 
-    { 
-        super(obj, nameSpace);
-
-        // Create DataTable instance
-        this.dataTable = new DataTable(this.container, {ajaxUrl   : this.containerUrl, domAttr : {colWidth : 250, mnWidth : 70}});
-
-        this.eventConfig = [
-            {selector : ".datepicker", action : "onmouseover", callBack : "setDatepicker"},
-        ];
-
-        this.setState([
-            {id : 'dateFrom', elmn : this.container.querySelectorAll('input.inpt-date')[0]},
-            {id : 'dateTo', elmn : this.container.querySelectorAll('input.inpt-date')[1]}
-        ]);
-
-        this.setEvents();
-    }
-
-    setDatepicker (obj)
-    {
-        GridDatePicker.createInstance(this.nameSpace, obj);
-    }
-
-    refreshDataTable ()
-    {
-        this.dataTable.setRequest();
     }
 }

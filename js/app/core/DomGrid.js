@@ -1,3 +1,14 @@
+/**
+ *-------------------------------------------
+ * Class DomGrid
+ *-------------------------------------------
+ * @version 1.0.5
+ * @createAt 15.06.2019 14:25
+ * @updatedAt 01.03.2022 14:52
+ * @author NetCoDev
+ *-------------------------------------------
+ **/
+
 class DomGrid
 {
     constructor (config)
@@ -6,7 +17,7 @@ class DomGrid
         this.container = document.getElementById(config.containerId);
         this.nameSpaces = [];
         this.components = [];
-        this.modal = new gridModal();
+        this.modal = new GridModal();
         this.registeredScripts = [];
         this.error = [];
         this.env = [
@@ -16,11 +27,12 @@ class DomGrid
             {"path": "module", "dataKey": "gridModule", "selector" : "data-grid-module", "elements" : []},
             {"path": "route", "dataKey": "gridRoute", "selector" : "data-grid-route", "elements" : []},
         ];
+        this.GridWatcher = new GridWatcher();
         // Load required js
         if (this.initRegisteredScripts()) {this.loadScript(0);}
 
         // Set ajax polyfill status
-        GridAjax.setUsePolyFill(false);
+        GridAjax.setUsePolyFill();
     }
 
     initRegisteredScripts ()
@@ -63,18 +75,18 @@ class DomGrid
         const env = this.getEnv('gridComponent');
         env.elements.map($e => {
             const nameSpace =  (GridUi.dataSetValue($e, "gridNameSpace") === "" )
-                ? GridUi.closest('[data-grid-name-space]', $e)
+                ? GridUi.dataSetValue(GridUi.closest('[data-grid-name-space]', $e), "gridNameSpace")
                 : GridUi.dataSetValue($e, "gridNameSpace");
             const component = eval($e.dataset.gridComponent);
             if (typeof this.nameSpaces[nameSpace] === 'undefined') {
                 this.nameSpaces[nameSpace] = {components: []};
             }
             if (typeof component !== undefined) {
-                const componentInstance = new component($e, nameSpace);
+                const newInstance = new component($e, nameSpace);
                 const id = (GridUi.dataSetValue($e, 'gridComponentId')) ? GridUi.dataSetValue($e, 'gridComponentId') : $e.dataset.gridComponent;
-                this.nameSpaces[nameSpace].components[id] = componentInstance;
+                this.nameSpaces[nameSpace].components[id] = newInstance;
                 if ($e.querySelectorAll("[data-grid-element]").length) {
-                    this.initElements (componentInstance, $e, nameSpace);
+                    this.initElements (newInstance, $e, nameSpace);
                 }
             }
         });
@@ -84,6 +96,7 @@ class DomGrid
     {
         // Element list with attribute data-grid-element
         const env = this.getEnv('gridElement');
+
         if (env.elements.length) {
             env.elements.map((obj) => {
                 // Select closest component as parent component
@@ -91,15 +104,94 @@ class DomGrid
                 // If parent exists
                 if (parent && parent.dataset.gridComponent === component.dataset.gridComponent) {
                     // If element object exists
-                    if (typeof eval(obj.dataset.gridElement) !== 'undefined') {
+                    if (eval("typeof " + obj.dataset.gridElement) !== 'undefined') {
                         // Create object instance
+                        if (typeof this.nameSpaces[parentNameSpace].elements === 'undefined') {
+                            this.nameSpaces[parentNameSpace].elements = {};
+                        }
+                        const componentId = (GridUi.dataSetValue(component, 'gridComponentId')) ? GridUi.dataSetValue(component, 'gridComponentId') : component.dataset.gridComponent;
                         const element = eval(obj.dataset.gridElement);
-
-                        new element(obj, {componentInstance : componentInstance, nameSpace : parentNameSpace, componentId : component.dataset.gridComponent});
+                        const newInstance = new element(obj, {componentInstance : componentInstance, nameSpace : parentNameSpace, componentId : componentId});
+                        const id = (GridUi.dataSetValue(obj, 'gridElementId')) ? GridUi.dataSetValue(obj, 'gridElementId') : obj.dataset.gridElement;
+                        this.nameSpaces[parentNameSpace].elements[id] = newInstance;
                     }
                 }
             });
+        } 
+    }
+
+    initNameSpaceElement (componentInstance, listElements)
+    {
+        try {
+            const nameSpace = componentInstance?.nameSpace;
+            const componentId = componentInstance?.componentId;
+            const env = this.getEnv('gridElement');
+            if (nameSpace && componentId && listElements.length) {
+                if (typeof this.nameSpaces[nameSpace].elements === 'undefined') {
+                    this.nameSpaces[nameSpace].elements = {};
+                }
+
+                [...listElements].map(element => {
+                    const gridElementId = element?.dataset?.gridElementId;
+                    const gridElement = element?.dataset?.gridElement;
+                    if (gridElementId && gridElement) {
+                        if (eval("typeof " + gridElement) === 'undefined') {
+                            const scriptFile = env["path"] + "/" + gridElement;
+                            const callBack = {obj:this, method: "initElementInstance", params: [element, gridElement, gridElementId, componentInstance]};
+                            this.addScript(scriptFile, callBack);
+                        } else {
+                            this.initElementInstance(element, gridElement, gridElementId, componentInstance);
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.error("DomGrid.initNameSpaceElement",  error.message);
         }
+    }
+
+    initElementInstance (element, gridElement, gridElementId, componentInstance)
+    {
+        try {
+            const ElementClass = eval(gridElement);
+            if (ElementClass) {
+                this.nameSpaces[componentInstance?.nameSpace].elements[gridElementId] = new ElementClass(element, {
+                    componentInstance: componentInstance,
+                    nameSpace: componentInstance?.nameSpace,
+                    componentId: componentInstance?.componentId
+                });
+            }
+        } catch (error) {console.error("DomGrid.initElementInstance",  error.message);}
+    }
+
+    resetElements (namespace, listElements)
+    {
+        try {
+            if (listElements.length && this.nameSpaces?.[namespace]) {
+                [...listElements].map(element => {
+                    const elementId = element?.dataset?.gridElementId;
+                    if (elementId) {
+                        delete this.nameSpaces[namespace].elements[elementId];
+                        GridStage.GridWatcher.deleteWatcher(elementId);
+                    }
+                });
+            }
+        } catch (error) {console.error("DomGrid.resetElements",  error.message);}
+    }
+
+    addScript (file, callBack = {})
+    {
+        const script = document.createElement('script');
+        script.onload = function () {
+            if (callBack?.obj) {
+                (callBack?.params) ? callBack.obj[callBack.method](...callBack.params) : callBack.obj[callBack.method]();
+            }
+        };
+        script.onerror = function () {
+            GridStage.setError("JS-Script kann nicht geladen werden: " + script.src);
+        };
+        script.src = this.config.scriptPath + file + ".js?" + Date.now();
+        document.querySelector("head").appendChild(script);
     }
 
     loadScript (scriptIndex)
@@ -119,28 +211,43 @@ class DomGrid
                 }
             }
         };
-
+        
         script.onerror = function () {
             GridStage.setError("JS-Script kann nicht geladen werden: " + script.src);
         };
 
         script.src = this.config.scriptPath + this.registeredScripts[scriptIndex] + ".js?" + Date.now();
-
+        
         document.querySelector("head").appendChild(script);
     }
 
     setNameSpaceComponentAction (nameSpaceId, componentId, method)
     {
-        if (this.nameSpaces.hasOwnProperty(nameSpaceId) && this.nameSpaces[nameSpaceId].components.hasOwnProperty(componentId)) {
-            const component = this.nameSpaces[nameSpaceId].components[componentId];
-            if (typeof component[method] === 'function') {
-                if (arguments.length > 3) {
-                    component[method](arguments[3]);
-                } else {
-                    component[method]();
+        try {
+            if (this.nameSpaces?.[nameSpaceId]) {
+                let component = undefined;
+                if (this.nameSpaces[nameSpaceId]?.components
+                    && this.nameSpaces[nameSpaceId].components?.[componentId]
+                ) {
+                    component = this.nameSpaces[nameSpaceId].components[componentId];
+                } else if (this.nameSpaces[nameSpaceId]?.elements
+                    && this.nameSpaces[nameSpaceId].elements?.[componentId]
+                ) {
+                    component = this.nameSpaces[nameSpaceId].elements[componentId];
+                }
+                if (component && typeof component[method] === 'function') {
+                    if (arguments.length > 3) {
+                        if (arguments[3]?.length) {
+                            component[method](...arguments[3]);
+                        } else {
+                            component[method](arguments[3]);
+                        }
+                    } else {
+                        component[method]();
+                    }
                 }
             }
-        }
+        } catch (error) {console.error("DomGrid.setNameSpaceComponentAction",  error.message, arguments);}
     }
 
     setError (error)
@@ -164,14 +271,16 @@ class DomGrid
     getNameSpaceComponentAction (nameSpaceId, componentId, method)
     {
         let result = null;
-        if (this.nameSpaces.hasOwnProperty(nameSpaceId) && this.nameSpaces[nameSpaceId].components.hasOwnProperty(componentId)) {
+        if (this.nameSpaces.hasOwnProperty(nameSpaceId)
+            && this.nameSpaces[nameSpaceId].components.hasOwnProperty(componentId)
+        ) {
             const component = this.nameSpaces[nameSpaceId].components[componentId];
-            if (typeof component[method] === 'function') {
+            if (typeof component[method] === 'function') { 
                 if (arguments.length > 3) {
-                    result = component[method](arguments[3]);
+                     result = component[method](arguments[3]);
                 } else {
                     result = component[method]();
-                }
+                } 
             }
         }
 

@@ -1,3 +1,14 @@
+/**
+ *-------------------------------------------
+ * Class GridComponent
+ *-------------------------------------------
+ * @version 1.0
+ * @createAt 15.06.2019 14:25
+ * @updatedAt 01.03.2022 14:52
+ * @author NetCoDev
+ *-------------------------------------------
+ **/
+
 class GridComponent
 {
     nameSpace;
@@ -7,16 +18,22 @@ class GridComponent
     state;
     stateOk;
     containerUrl;
+    gridWatcher;
+    gridElementWatcher;
 
     constructor (container, nameSpace)
     {
         this.nameSpace = nameSpace;
-        this.componentId = container.dataset.gridComponent;
+        this.componentId = (container?.dataset?.gridComponentId) ? container.dataset.gridComponentId : container.dataset.gridComponent;
         this.container = container;
         this.eventConfig = [];
         this.state = {};
         this.stateOk = true;
-        this.containerUrl = GridUi.dataSetValue(this.container,'containerUrl');
+        this.containerUrl = this.container?.dataset?.containerUrl;
+        this.containerRequestUrl = this.container?.dataset?.containerRequestUrl;
+        this.containerTriggerUrl = this.container?.dataset?.containerTriggerUrl;
+        this.gridWatcher = this.container?.dataset?.gridWatcher;
+        this.gridElementWatcher = this.container?.dataset?.gridElementWatcher;
     }
 
     setEvents ()
@@ -28,9 +45,9 @@ class GridComponent
 
         eventList.map((conf) => 
         {
-            const list = (conf.selector !== '')
-                ? this.container.querySelectorAll(conf.selector)
-                : [this.container];
+            const list = (conf?.container && conf.selector !== '')
+                ? conf.container.querySelectorAll(conf.selector)
+                : ((conf.selector !== '') ? this.container.querySelectorAll(conf.selector) : [this.container]);
 
             if (list && list.length) {
                 [...list].map((obj) => {
@@ -88,21 +105,38 @@ class GridComponent
 
     setComponentAction (conf)
     {
-        const multipleAct = (arguments.length > 1) ? arguments[1] : false;
 
-        if (!multipleAct) {
-            GridStage.setNameSpaceComponentAction(this.nameSpace, ...conf);
-        } else {
-            conf.map((args) => {
-                GridStage.setNameSpaceComponentAction(this.nameSpace, ...args);
-            });
-        }
+        try {
+            const multipleAct = (arguments.length > 1) ? arguments[1] : false;
+
+            if (!multipleAct) {
+                GridStage.setNameSpaceComponentAction(this.nameSpace, ...conf);
+            } else {
+                conf.map((args) => {
+                    GridStage.setNameSpaceComponentAction(this.nameSpace, ...args);
+                });
+            }
+        } catch (error) {console.error("GridComponent.setComponentAction",  error.message);}
     }
 
     setComponentRequest (requestAct, request)
     {
         request.component = this;
         GridAjax[requestAct](request);
+    }
+
+    runWatcher (watcherList = [], paramsList = [])
+    {
+        try {
+            if (this.gridWatcher || watcherList.length) {
+                const watchers = (!watcherList.length) ? this.gridWatcher.split(',') : watcherList;
+                watchers.map((watcher, index) => {
+                    if (paramsList?.[index]) {
+                        GridStage.GridWatcher.runWatcher(watcher, paramsList[index]);
+                    } else {GridStage.GridWatcher.runWatcher(watcher)}
+                });
+            }
+        } catch (error) {console.error("GridComponent.runWatcher",  error.message);}
     }
 
     getState (key)
