@@ -115,6 +115,8 @@ class GridUi
                 }
             }
         }
+
+        return result;
     }
 
     static checkDataChanged (list)
